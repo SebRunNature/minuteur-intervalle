@@ -96,6 +96,15 @@ body.phase-trepos{background:var(--trepos-bg)}
 .cfg-citation{margin:0 18px 0;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px}
 @media(max-width:380px){.cfg-value{font-size:1.6rem}.timer-big{font-size:3.6rem}.ring-wrap{width:190px;height:190px}}
 </style>
+  <link rel="manifest" href="/minuteur-intervalle/manifest.json">
+<meta name="theme-color" content="#f5dd00">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Minuteur Trail">
+<script>
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/minuteur-intervalle/sw.js');
+}
+</script>
 </head>
 <body>
 
