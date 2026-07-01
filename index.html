@@ -114,12 +114,44 @@ body.phase-trepos{background:var(--trepos-bg)}
 @media(max-width:380px){.cfg-value{font-size:1.6rem}.timer-big{font-size:3.6rem}.ring-wrap{width:190px;height:190px}}
 </style>
   <link rel="manifest" href="/minuteur-intervalle/manifest.json">
+  <link rel="apple-touch-icon" href="/minuteur-intervalle/icon-192.png">
 <meta name="theme-color" content="#1d9e75">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Minuteur Trail">
+<meta name="apple-mobile-web-app-title" content="Minuteur HIIT">
 <script>
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('/minuteur-intervalle/sw.js');
+if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+    window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/minuteur-intervalle/sw.js')
+            .then(function(reg) {
+                function showUpdateBanner() {
+                    if (document.getElementById('swUpdateBanner')) return;
+                    const b = document.createElement('div');
+                    b.id = 'swUpdateBanner';
+                    b.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);' +
+                        'background:#1e2e28;color:#fff;padding:12px 18px;border-radius:14px;' +
+                        'box-shadow:0 10px 25px rgba(0,0,0,.3);z-index:99999;display:flex;' +
+                        'align-items:center;gap:14px;font-family:Inter,sans-serif;font-size:.9rem;font-weight:700;';
+                    b.innerHTML = 'Nouvelle version disponible' +
+                        '<button id="swUpdateBtn" style="background:#1d9e75;color:#fff;border:none;' +
+                        'padding:8px 14px;border-radius:10px;font-weight:800;cursor:pointer;font-family:inherit;">Recharger</button>';
+                    document.body.appendChild(b);
+                    document.getElementById('swUpdateBtn').addEventListener('click', function() {
+                        window.location.reload(true);
+                    });
+                }
+                if (reg.waiting && navigator.serviceWorker.controller) showUpdateBanner();
+                reg.addEventListener('updatefound', function() {
+                    const newWorker = reg.installing;
+                    if (!newWorker) return;
+                    newWorker.addEventListener('statechange', function() {
+                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                            showUpdateBanner();
+                        }
+                    });
+                });
+            })
+            .catch(function(err) { console.warn('SW échec :', err); });
+    });
 }
 </script>
   <!-- Google Analytics -->
