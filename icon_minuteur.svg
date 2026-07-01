@@ -1,6 +1,32 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
-  <rect width="512" height="512" rx="80" fill="#f5dd00"/>
-  <text x="256" y="200" font-family="Arial, sans-serif" font-weight="900" font-size="140" fill="#1a1a1a" text-anchor="middle" dominant-baseline="middle">SRN</text>
-  <text x="256" y="320" font-family="Arial, sans-serif" font-weight="700" font-size="46" fill="rgba(0,0,0,0.6)" text-anchor="middle" dominant-baseline="middle">MINUTEUR</text>
-  <path d="M140 400 L200 320 L240 360 L290 280 L340 340 L380 300 L420 400Z" fill="rgba(0,0,0,0.08)" stroke="rgba(0,0,0,0.3)" stroke-width="3" stroke-linejoin="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img">
+  <title>Run Nature — Minuteur HIIT</title>
+  <desc>Montagne en fond avec trotteuse de chronomètre pointant le sommet, dégradé vert forêt sombre</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1d3727"/>
+      <stop offset="100%" stop-color="#0f1a13"/>
+    </linearGradient>
+    <clipPath id="rounded">
+      <rect width="512" height="512" rx="115" ry="115"/>
+    </clipPath>
+  </defs>
+
+  <rect width="512" height="512" rx="115" ry="115" fill="url(#bg)"/>
+
+  <g clip-path="url(#rounded)">
+    <!-- Couronne du chronomètre -->
+    <rect x="228" y="40" width="56" height="48" rx="12" fill="#00c484"/>
+
+    <!-- Boîtier / cadran -->
+    <circle cx="256" cy="288" r="184" fill="none" stroke="#1d3727" stroke-width="32"/>
+    <circle cx="256" cy="288" r="184" fill="none" stroke="#00a06e" stroke-width="32" stroke-dasharray="16 40" opacity="0.4"/>
+
+    <!-- Montagne en fond, à l'intérieur du cadran -->
+    <polygon points="160,360 256,216 352,360" fill="#173324" opacity="0.9"/>
+
+    <!-- Trotteuse pointant vers le sommet -->
+    <line x1="256" y1="288" x2="256" y2="152" stroke="#00c484" stroke-width="16" stroke-linecap="round"/>
+    <polygon points="256,152 240,192 272,192" fill="#00c484"/>
+    <circle cx="256" cy="288" r="20" fill="#00c484"/>
+  </g>
 </svg>
