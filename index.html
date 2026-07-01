@@ -3,37 +3,49 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Minuteur Trail – Seb Run Nature</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<title>Minuteur Trail – Run Nature</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--green:#2d9e72;--green-dk:#1a6b4a;--green-lt:#a8f0d0;--bg:#0a0f0c;--card:#131a16;--card2:#1a2620;--text:#e8f5f0;--muted:#5a8a7a;--border:#243028;--radius:14px;--effort-bg:#0a1f14;--repos-bg:#0a1020;--trepos-bg:#140a20}
-body.light{--bg:#f0f7f4;--card:#ffffff;--card2:#e8f5f0;--text:#1a2e26;--muted:#6b9e8a;--border:#c8e8dc}
+:root{
+    --font-main:    'Inter', system-ui, sans-serif;
+    --font-display: 'Sora', 'Inter', sans-serif;
+    --green:#1d9e75;--green-dk:#0f6e56;--green-lt:#e1f5ee;--green-bright:#5dcaa5;
+    --bg:#faf5ef;--card:#ffffff;--card2:#f3ede4;--text:#241f1a;--muted:#7d756a;--border:#e9e1d4;
+    --radius:14px;
+    --effort-bg:#e1f5ee;--repos-bg:#e6f1fb;--trepos-bg:#f3efe7;
+    --shadow: 0 1px 2px rgba(40,30,15,.04), 0 1px 1px rgba(40,30,15,.03);
+}
+body.light{--bg:#faf5ef;--card:#ffffff;--card2:#f3ede4;--text:#241f1a;--muted:#7d756a;--border:#e9e1d4}
+body:not(.light){
+    --green-lt:#0f3d2e;--bg:#0f1611;--card:#19211b;--card2:#1c261e;--text:#f0ece3;--muted:#8aa395;--border:#28332b;
+    --effort-bg:#0f3d2e;--repos-bg:#0c2440;--trepos-bg:#241f18;
+}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%}
-body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;transition:background .5s}
+body{font-family:var(--font-main);background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;transition:background .5s}
 body.phase-effort{background:var(--effort-bg)}
 body.phase-repos{background:var(--repos-bg)}
 body.phase-trepos{background:var(--trepos-bg)}
 .header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);flex-shrink:0}
 .header-logo{display:flex;align-items:center;gap:10px}
-.header-logo span{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:1.5px;color:var(--green-lt)}
-.header-title{font-family:'Bebas Neue',sans-serif;font-size:1.05rem;letter-spacing:2px;color:var(--muted)}
+.header-logo span{font-family:var(--font-display);font-weight:700;font-size:.95rem;letter-spacing:-.2px;line-height:1.1;color:var(--green-bright)}
+.header-logo-sub{font-size:.6rem;color:var(--muted);font-weight:500;letter-spacing:.04em;text-transform:uppercase}
 .header-sound{background:none;border:none;cursor:pointer;color:var(--muted);font-size:1.4rem;padding:4px;transition:color .2s}
 .header-sound.on{color:var(--green)}
 .header-btn{background:none;border:none;cursor:pointer;color:var(--muted);font-size:1.2rem;padding:4px 6px;border-radius:8px;transition:all .2s;line-height:1}
-.header-btn:hover{color:var(--green-lt);background:rgba(45,158,114,.12)}
+.header-btn:hover{color:var(--green-bright);background:rgba(29,158,117,.12)}
 .header-controls{display:flex;align-items:center;gap:4px}
 .total-hero{margin:14px 18px 0;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
 .total-label{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--muted)}
-.total-value{font-family:'Bebas Neue',sans-serif;font-size:2.6rem;letter-spacing:2px;color:var(--green-lt);line-height:1}
+.total-value{font-family:var(--font-display);font-weight:700;font-size:2.4rem;letter-spacing:-1px;color:var(--green-bright);line-height:1}
 .config-body{padding:12px 18px;display:grid;grid-template-columns:1fr 1fr;gap:10px;flex:1;align-content:start}
 .cfg-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px;cursor:pointer;transition:border-color .2s;position:relative}
 .cfg-card:hover,.cfg-card.editing{border-color:var(--green)}
 .cfg-card-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}
 .cfg-icon{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0}
-.cfg-icon.effort{background:rgba(45,158,114,.25)}.cfg-icon.repos{background:rgba(58,123,213,.25)}.cfg-icon.exo{background:rgba(232,160,32,.25)}.cfg-icon.tours{background:rgba(168,240,208,.15)}.cfg-icon.treposs{background:rgba(120,80,200,.25)}.cfg-icon.son{background:rgba(90,138,122,.25)}
+.cfg-icon.effort{background:rgba(29,158,117,.25)}.cfg-icon.repos{background:rgba(58,123,213,.25)}.cfg-icon.exo{background:rgba(232,160,32,.25)}.cfg-icon.tours{background:rgba(168,240,208,.15)}.cfg-icon.treposs{background:rgba(120,80,200,.25)}.cfg-icon.son{background:rgba(90,138,122,.25)}
 .cfg-label{font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)}
-.cfg-value{font-family:'Bebas Neue',sans-serif;font-size:1.9rem;letter-spacing:1px;color:var(--text);line-height:1}
+.cfg-value{font-family:var(--font-display);font-weight:700;font-size:1.7rem;letter-spacing:-.5px;color:var(--text);line-height:1}
 .cfg-edit-icon{position:absolute;bottom:10px;right:12px;color:var(--muted);font-size:.7rem;opacity:.4}
 .cfg-toggle{display:flex;align-items:center;height:30px}
 .toggle-track{width:46px;height:24px;border-radius:12px;background:var(--border);position:relative;cursor:pointer;transition:background .25s}
@@ -41,25 +53,32 @@ body.phase-trepos{background:var(--trepos-bg)}
 .toggle-thumb{width:18px;height:18px;border-radius:50%;background:#fff;position:absolute;top:3px;left:3px;transition:transform .25s}
 .toggle-track.on .toggle-thumb{transform:translateX(22px)}
 .cfg-input-row{display:flex;align-items:center;gap:6px;margin-top:6px;flex-wrap:wrap}
-.cfg-input{background:var(--card2);border:1px solid var(--green);border-radius:8px;color:var(--text);font-family:'Bebas Neue',sans-serif;font-size:1.5rem;width:68px;text-align:center;padding:3px 4px;outline:none}
+.cfg-input{background:var(--card2);border:1px solid var(--green);border-radius:8px;color:var(--text);font-family:var(--font-display);font-weight:700;font-size:1.4rem;width:68px;text-align:center;padding:3px 4px;outline:none}
+.cfg-input::-webkit-outer-spin-button,.cfg-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.cfg-input[type=number]{-moz-appearance:textfield;appearance:textfield}
 .cfg-input-unit{font-size:.68rem;color:var(--muted);font-weight:700}
 .cfg-spinner{display:flex;flex-direction:column;gap:2px}
-.cfg-spin-btn{background:var(--card2);border:1px solid var(--border);border-radius:5px;width:26px;height:22px;color:var(--green-lt);font-size:.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:800;transition:background .15s}
+.cfg-spin-btn{background:var(--card2);border:1px solid var(--border);border-radius:5px;width:26px;height:22px;color:var(--green-bright);font-size:.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:800;transition:background .15s}
 .cfg-spin-btn:hover{background:var(--green-dk)}
 .presets-wrap{padding:4px 18px 0;flex-shrink:0}
+.quick-settings{margin:2px 18px 0;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:4px 16px;display:flex;align-items:center}
+.qs-item{flex:1;display:flex;align-items:center;justify-content:space-between;padding:10px 0;gap:10px}
+.qs-label{display:flex;align-items:center;gap:8px;font-size:.82rem;font-weight:600;color:var(--text)}
+.qs-label .ic{color:var(--green);width:1em;height:1em}
+.qs-sep{width:1px;align-self:stretch;background:var(--border);margin:8px 14px}
 .presets-label{font-size:.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:8px}
 .presets-row{display:flex;gap:8px;flex-wrap:wrap}
-.btn-preset{flex:1;min-width:0;padding:10px 6px;background:var(--card);border:1px solid var(--border);border-radius:10px;cursor:pointer;font-family:'Bebas Neue',sans-serif;font-size:.85rem;letter-spacing:1px;color:var(--muted);transition:all .2s;text-align:center;line-height:1.3}
-.btn-preset:hover{border-color:var(--green);color:var(--green-lt);background:var(--card2)}
-.btn-preset.active{border-color:var(--green);color:var(--green-lt);background:rgba(45,158,114,.12)}
+.btn-preset{flex:1;min-width:0;padding:10px 6px;background:var(--card);border:1px solid var(--border);border-radius:10px;cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:.85rem;letter-spacing:0;color:var(--muted);transition:all .2s;text-align:center;line-height:1.3}
+.btn-preset:hover{border-color:var(--green);color:var(--green-bright);background:var(--card2)}
+.btn-preset.active{border-color:var(--green);color:var(--green-bright);background:rgba(29,158,117,.12)}
 .btn-preset-name{display:block;font-size:.9rem;color:var(--text)}
-.btn-preset-detail{display:block;font-size:.58rem;font-weight:700;font-family:'Nunito',sans-serif;color:var(--muted);margin-top:2px;letter-spacing:.02em}
+.btn-preset-detail{display:block;font-size:.58rem;font-weight:700;font-family:var(--font-main);color:var(--muted);margin-top:2px;letter-spacing:.02em}
 .start-wrap{padding:10px 18px;flex-shrink:0}
-.btn-start{width:100%;padding:16px;background:linear-gradient(135deg,var(--green-dk),var(--green));border:none;border-radius:14px;cursor:pointer;font-family:'Bebas Neue',sans-serif;font-size:1.55rem;letter-spacing:3px;color:#fff;transition:all .2s;box-shadow:0 4px 20px rgba(45,158,114,.3)}
-.btn-start:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(45,158,114,.4)}
+.btn-start{width:100%;padding:16px;background:linear-gradient(135deg,var(--green-dk),var(--green));border:none;border-radius:14px;cursor:pointer;font-family:var(--font-display);font-weight:700;font-size:1.15rem;letter-spacing:.06em;text-transform:uppercase;color:#fff;transition:all .2s;box-shadow:0 4px 20px rgba(29,158,117,.3)}
+.btn-start:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(29,158,117,.4)}
 .timer-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:12px 18px 14px}
-.phase-label{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:3px;padding:7px 22px;border-radius:30px;transition:all .4s}
-.phase-label.effort{background:rgba(45,158,114,.2);color:var(--green-lt);border:1px solid rgba(45,158,114,.4)}
+.phase-label{font-family:var(--font-display);font-weight:700;font-size:.95rem;letter-spacing:.08em;text-transform:uppercase;padding:7px 22px;border-radius:30px;transition:all .4s}
+.phase-label.effort{background:rgba(29,158,117,.2);color:var(--green-bright);border:1px solid rgba(29,158,117,.4)}
 .phase-label.repos{background:rgba(58,123,213,.2);color:#a8c8f8;border:1px solid rgba(58,123,213,.4)}
 .phase-label.trepos{background:rgba(120,80,200,.2);color:#c8b0f8;border:1px solid rgba(120,80,200,.4)}
 .ring-wrap{position:relative;width:220px;height:220px;display:flex;align-items:center;justify-content:center}
@@ -68,36 +87,34 @@ body.phase-trepos{background:var(--trepos-bg)}
 .ring-fill{fill:none;stroke-width:10;stroke-linecap:round;stroke-dasharray:660;stroke-dashoffset:0;transition:stroke-dashoffset .5s linear,stroke .4s}
 .ring-fill.effort{stroke:var(--green)}.ring-fill.repos{stroke:#3a7bd5}.ring-fill.trepos{stroke:#7850c8}
 .timer-display{text-align:center;z-index:1}
-.timer-big{font-family:'Bebas Neue',sans-serif;font-size:4.4rem;letter-spacing:3px;line-height:1;color:var(--text)}
+.timer-big{font-family:var(--font-display);font-weight:700;font-size:4rem;letter-spacing:-2px;line-height:1;color:var(--text)}
 .timer-sub{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-top:3px}
 .timer-total-pill{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:5px 16px;font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);display:inline-flex;align-items:center;gap:6px}
-.timer-total-pill span{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--green-lt);letter-spacing:1px}
+.timer-total-pill span{font-family:var(--font-display);font-weight:700;font-size:1.05rem;color:var(--green-bright);letter-spacing:-.3px}
 .progress-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;width:100%}
 .prog-chip{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:8px 14px;text-align:center;min-width:75px}
-.prog-chip-val{font-family:'Bebas Neue',sans-serif;font-size:1.35rem;color:var(--green-lt);line-height:1}
+.prog-chip-val{font-family:var(--font-display);font-weight:700;font-size:1.3rem;letter-spacing:-.3px;color:var(--green-bright);line-height:1}
 .prog-chip-lbl{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-top:2px}
 .controls{display:flex;gap:8px;width:100%}
-.btn-ctrl{flex:1;padding:13px;border:1px solid var(--border);border-radius:12px;cursor:pointer;font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:1.5px;transition:all .2s;background:var(--card);color:var(--muted)}
-.btn-ctrl.primary{background:linear-gradient(135deg,var(--green-dk),var(--green));color:#fff;border-color:transparent;box-shadow:0 4px 14px rgba(45,158,114,.25)}
-.btn-ctrl:hover{border-color:var(--green);color:var(--green-lt)}
+.btn-ctrl{flex:1;padding:13px;border:1px solid var(--border);border-radius:12px;cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:.92rem;letter-spacing:0;transition:all .2s;background:var(--card);color:var(--muted)}
+.btn-ctrl.primary{background:linear-gradient(135deg,var(--green-dk),var(--green));color:#fff;border-color:transparent;box-shadow:0 4px 14px rgba(29,158,117,.25)}
+.btn-ctrl:hover{border-color:var(--green);color:var(--green-bright)}
 .citation-banner{background:var(--card);border-top:1px solid var(--border);padding:11px 18px;flex-shrink:0}
-.citation-text{font-size:.82rem;font-style:italic;line-height:1.5;color:var(--text);text-align:center}
-.citation-author{font-size:.68rem;font-weight:800;color:var(--green);text-transform:uppercase;letter-spacing:.5px;margin-top:4px;text-align:center}
 .footer{flex-shrink:0;padding:9px 18px;border-top:1px solid var(--border);text-align:center;font-size:.72rem;font-weight:700;color:var(--muted);letter-spacing:.3px}
 .footer a{color:var(--green);text-decoration:none}
-.footer a:hover{color:var(--green-lt)}
+.footer a:hover{color:var(--green-bright)}
 .finish-screen{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px;text-align:center}
 .finish-icon{font-size:3.5rem;animation:pop .5s ease}
 @keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}
-.finish-title{font-family:'Bebas Neue',sans-serif;font-size:2.2rem;letter-spacing:2px;color:var(--green-lt)}
+.finish-title{font-family:var(--font-display);font-weight:700;font-size:2rem;letter-spacing:-1px;color:var(--green-bright)}
+.ic{width:1.1em;height:1.1em;display:inline-block;vertical-align:-0.18em;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;fill:none;flex-shrink:0}
 .finish-stat{font-size:.82rem;color:var(--muted);font-weight:700}
 .page{display:none;flex:1;flex-direction:column;overflow-y:auto;min-height:0}
 .page.active{display:flex}
-.cfg-citation{margin:0 18px 0;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px}
 @media(max-width:380px){.cfg-value{font-size:1.6rem}.timer-big{font-size:3.6rem}.ring-wrap{width:190px;height:190px}}
 </style>
   <link rel="manifest" href="/minuteur-intervalle/manifest.json">
-<meta name="theme-color" content="#f5dd00">
+<meta name="theme-color" content="#1d9e75">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Minuteur Trail">
 <script>
@@ -116,22 +133,47 @@ if('serviceWorker' in navigator){
 </head>
 <body>
 
+<!-- Sprite icônes Tabler (MIT) - hors ligne -->
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true"><defs>
+<g id="i-moon"><path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z"/></g>
+<g id="i-sun"><circle cx="12" cy="12" r="4"/><path d="M3 12h1M20 12h1M12 3v1M12 20v1M5.6 5.6l.7 .7M18.4 18.4l-.7 -.7M5.6 18.4l.7 -.7M18.4 5.6l-.7 .7"/></g>
+<g id="i-expand"><path d="M4 8V5a1 1 0 0 1 1 -1h3M4 16v3a1 1 0 0 0 1 1h3M16 4h3a1 1 0 0 1 1 1v3M16 20h3a1 1 0 0 0 1 -1v-3"/></g>
+<g id="i-collapse"><path d="M15 19v-2a2 2 0 0 1 2 -2h2M15 5v2a2 2 0 0 0 2 2h2M5 15h2a2 2 0 0 1 2 2v2M5 9h2a2 2 0 0 0 2 -2v-2"/></g>
+<g id="i-mic"><path d="M9 4a3 3 0 0 1 6 0v6a3 3 0 0 1 -6 0z"/><path d="M5 10a7 7 0 0 0 14 0"/><path d="M8 21l8 0"/><path d="M12 17l0 4"/></g>
+<g id="i-mic-off"><path d="M9 5a3 3 0 0 1 6 0v4m0 4v.5a3 3 0 0 1 -5.5 1.5"/><path d="M5 10a7 7 0 0 0 10.34 6.14"/><path d="M17.4 15.4a7 7 0 0 0 1.6 -5.4"/><path d="M8 21l8 0"/><path d="M12 17l0 4"/><path d="M3 3l18 18"/></g>
+<g id="i-volume"><path d="M15 8a5 5 0 0 1 0 8"/><path d="M17.7 5a9 9 0 0 1 0 14"/><path d="M6 15h-2a1 1 0 0 1 -1 -1v-4a1 1 0 0 1 1 -1h2l3.5 -4.5a.8 .8 0 0 1 1.5 .5v14a.8 .8 0 0 1 -1.5 .5l-3.5 -4.5"/></g>
+<g id="i-volume-off"><path d="M15 8a5 5 0 0 1 1.912 4.934m-1.377 2.602a5 5 0 0 1 -.535 .464"/><path d="M17.7 5a9 9 0 0 1 2.362 11.086m-1.676 2.299a9 9 0 0 1 -.686 .615"/><path d="M9.9 9.9v-2.9l-3.9 3.9h-2a1 1 0 0 0 -1 1v4a1 1 0 0 0 1 1h2l3.9 3.9v-3.9m0 -4.06v.06"/><path d="M3 3l18 18"/></g>
+<g id="i-play"><path d="M7 4v16l13 -8z"/></g>
+<g id="i-pause"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></g>
+<g id="i-refresh"><path d="M20 11a8 8 0 1 0 -2.5 5.8l2.5 -2.3"/><path d="M20 4v6h-6"/></g>
+<g id="i-skip"><path d="M4 5v14l12 -7z"/><path d="M20 5l0 14"/></g>
+<g id="i-edit"><path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1"/><path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3z"/></g>
+<g id="i-clock"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></g>
+<g id="i-barbell"><path d="M2 12h1"/><path d="M21 12h1"/><path d="M5 9v6"/><path d="M19 9v6"/><path d="M7 10v4"/><path d="M17 10v4"/><path d="M7 12h10"/></g>
+<g id="i-bolt"><path d="M13 3l0 7l6 0l-8 11l0 -7l-6 0l8 -11"/></g>
+<g id="i-mountain"><path d="M3 19h18l-6.5 -11l-3.5 6l-2 -3z"/></g>
+<g id="i-trophy"><path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1 -10 0z"/><path d="M5 9a2 2 0 0 1 -2 -2v-1h4"/><path d="M19 9a2 2 0 0 0 2 -2v-1h-4"/></g>
+<g id="i-back"><path d="M9 14l-4 -4l4 -4"/><path d="M5 10h11a4 4 0 1 1 0 8h-1"/></g>
+</defs></svg>
+
 <div class="header">
   <div class="header-logo">
-    <svg width="32" height="32" viewBox="0 0 44 44" fill="none">
-      <circle cx="22" cy="22" r="22" fill="rgba(45,158,114,.2)"/>
-      <path d="M10 32 L18 18 L24 24 L30 14 L34 20" stroke="#a8f0d0" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-      <circle cx="30" cy="14" r="3" fill="#a8f0d0"/>
-      <path d="M14 34 Q22 28 30 34" stroke="rgba(255,255,255,.3)" stroke-width="1.5" fill="none"/>
+    <svg class="ic" width="30" height="30" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg" style="stroke:none">
+      <circle cx="22" cy="22" r="22" fill="rgba(93,202,165,.14)"/>
+      <path d="M11 30 L19 17 L24 23 L29 13 L33 30 Z" fill="none" stroke="#5dcaa5" stroke-width="2.2" stroke-linejoin="round"/>
+      <circle cx="29" cy="13" r="2.4" fill="#5dcaa5"/>
+      <path d="M13 30 L31 30" stroke="rgba(159,225,203,.45)" stroke-width="1.6" stroke-linecap="round"/>
     </svg>
-    <span>Seb Run Nature</span>
+    <div>
+      <div>Run Nature</div>
+      <div class="header-logo-sub">Minuteur HIIT</div>
+    </div>
   </div>
-  <div class="header-title">MINUTEUR D'INTERVALLE</div>
   <div class="header-controls">
-    <button class="header-btn" id="btnTheme" onclick="toggleTheme()" title="Mode jour/nuit">🌙</button>
-    <button class="header-btn" id="btnFs" onclick="toggleFullscreen()" title="Plein écran">⛶</button>
-    <button class="header-sound on" id="btnVoice" onclick="toggleVoice()" title="Annonces vocales">🗣️</button>
-    <button class="header-sound on" id="btnSound" onclick="toggleSound()">🔊</button>
+    <button class="header-btn" id="btnTheme" onclick="toggleTheme()" title="Mode jour/nuit"><svg class="ic"><use href="#i-moon"/></svg></button>
+    <button class="header-btn" id="btnFs" onclick="toggleFullscreen()" title="Plein écran"><svg class="ic" id="fsIcon"><use href="#i-expand"/></svg></button>
+    <button class="header-sound on" id="btnVoice" onclick="toggleVoice()" title="Annonces vocales"><svg class="ic" id="voiceIcon"><use href="#i-mic"/></svg></button>
+    <button class="header-sound on" id="btnSound" onclick="toggleSound()" title="Son"><svg class="ic" id="soundIcon"><use href="#i-volume"/></svg></button>
   </div>
 </div>
 
@@ -145,7 +187,7 @@ if('serviceWorker' in navigator){
 
   <div class="config-body">
     <div class="cfg-card" onclick="editCard('effort')" id="cardEffort">
-      <div class="cfg-card-head"><div class="cfg-icon effort">▶</div><span class="cfg-label">Effort</span></div>
+      <div class="cfg-card-head"><div class="cfg-icon effort"><svg class="ic"><use href="#i-play"/></svg></div><span class="cfg-label">Effort</span></div>
       <div id="valEffort" class="cfg-value">00:20</div>
       <div id="editEffort" style="display:none">
         <div class="cfg-input-row">
@@ -157,11 +199,11 @@ if('serviceWorker' in navigator){
           <span class="cfg-input-unit">sec</span>
         </div>
       </div>
-      <span class="cfg-edit-icon">✏️</span>
+      <span class="cfg-edit-icon"><svg class="ic" style="width:.85em;height:.85em"><use href="#i-edit"/></svg></span>
     </div>
 
     <div class="cfg-card" onclick="editCard('repos')" id="cardRepos">
-      <div class="cfg-card-head"><div class="cfg-icon repos">⏳</div><span class="cfg-label">Repos</span></div>
+      <div class="cfg-card-head"><div class="cfg-icon repos"><svg class="ic"><use href="#i-clock"/></svg></div><span class="cfg-label">Repos</span></div>
       <div id="valRepos" class="cfg-value">00:10</div>
       <div id="editRepos" style="display:none">
         <div class="cfg-input-row">
@@ -173,11 +215,11 @@ if('serviceWorker' in navigator){
           <span class="cfg-input-unit">sec</span>
         </div>
       </div>
-      <span class="cfg-edit-icon">✏️</span>
+      <span class="cfg-edit-icon"><svg class="ic" style="width:.85em;height:.85em"><use href="#i-edit"/></svg></span>
     </div>
 
     <div class="cfg-card" onclick="editCard('exo')" id="cardExo">
-      <div class="cfg-card-head"><div class="cfg-icon exo">🏋</div><span class="cfg-label">Exercices</span></div>
+      <div class="cfg-card-head"><div class="cfg-icon exo"><svg class="ic"><use href="#i-barbell"/></svg></div><span class="cfg-label">Exercices</span></div>
       <div id="valExo" class="cfg-value">8</div>
       <div id="editExo" style="display:none">
         <div class="cfg-input-row">
@@ -185,11 +227,11 @@ if('serviceWorker' in navigator){
           <input class="cfg-input" id="inExo" type="number" min="1" max="30" value="8">
         </div>
       </div>
-      <span class="cfg-edit-icon">✏️</span>
+      <span class="cfg-edit-icon"><svg class="ic" style="width:.85em;height:.85em"><use href="#i-edit"/></svg></span>
     </div>
 
     <div class="cfg-card" onclick="editCard('tours')" id="cardTours">
-      <div class="cfg-card-head"><div class="cfg-icon tours">🔄</div><span class="cfg-label">Tours</span></div>
+      <div class="cfg-card-head"><div class="cfg-icon tours"><svg class="ic"><use href="#i-refresh"/></svg></div><span class="cfg-label">Tours</span></div>
       <div id="valTours" class="cfg-value">2</div>
       <div id="editTours" style="display:none">
         <div class="cfg-input-row">
@@ -197,11 +239,11 @@ if('serviceWorker' in navigator){
           <input class="cfg-input" id="inTours" type="number" min="1" max="20" value="2">
         </div>
       </div>
-      <span class="cfg-edit-icon">✏️</span>
+      <span class="cfg-edit-icon"><svg class="ic" style="width:.85em;height:.85em"><use href="#i-edit"/></svg></span>
     </div>
 
-    <div class="cfg-card" onclick="editCard('trepos')" id="cardTrepos">
-      <div class="cfg-card-head"><div class="cfg-icon treposs">⏱</div><span class="cfg-label">Tour de repos</span></div>
+    <div class="cfg-card" onclick="editCard('trepos')" id="cardTrepos" style="display:none">
+      <div class="cfg-card-head"><div class="cfg-icon treposs"><svg class="ic"><use href="#i-clock"/></svg></div><span class="cfg-label">Tour de repos</span></div>
       <div id="valTrepos" class="cfg-value">01:00</div>
       <div id="editTrepos" style="display:none">
         <div class="cfg-input-row">
@@ -213,33 +255,29 @@ if('serviceWorker' in navigator){
           <span class="cfg-input-unit">sec</span>
         </div>
       </div>
-      <span class="cfg-edit-icon">✏️</span>
-    </div>
-
-    <div class="cfg-card">
-      <div class="cfg-card-head"><div class="cfg-icon son">🔊</div><span class="cfg-label">Son</span></div>
-      <div class="cfg-toggle">
-        <div class="toggle-track on" id="trackSon" onclick="toggleSound()"><div class="toggle-thumb"></div></div>
-      </div>
-    </div>
-
-    <div class="cfg-card">
-      <div class="cfg-card-head"><div class="cfg-icon" style="background:rgba(255,200,50,.2)">🗣️</div><span class="cfg-label">Voix</span></div>
-      <div class="cfg-toggle">
-        <div class="toggle-track on" id="trackVoice" onclick="toggleVoice()"><div class="toggle-thumb"></div></div>
-      </div>
-      <div style="font-size:.6rem;color:var(--muted);margin-top:6px;font-weight:700;">Annonces vocales</div>
+      <span class="cfg-edit-icon"><svg class="ic" style="width:.85em;height:.85em"><use href="#i-edit"/></svg></span>
     </div>
 
   </div><!-- fin config-body -->
 
-  <div class="cfg-citation">
-    <div class="citation-text" id="cfgCitText"></div>
-    <div class="citation-author" id="cfgCitAuthor"></div>
+  <div class="quick-settings">
+    <div class="qs-item">
+      <div class="qs-label"><svg class="ic"><use href="#i-volume"/></svg> Son</div>
+      <div class="cfg-toggle">
+        <div class="toggle-track on" id="trackSon" onclick="toggleSound()"><div class="toggle-thumb"></div></div>
+      </div>
+    </div>
+    <div class="qs-sep"></div>
+    <div class="qs-item">
+      <div class="qs-label"><svg class="ic"><use href="#i-mic"/></svg> Annonces vocales</div>
+      <div class="cfg-toggle">
+        <div class="toggle-track on" id="trackVoice" onclick="toggleVoice()"><div class="toggle-thumb"></div></div>
+      </div>
+    </div>
   </div>
 
   <div class="presets-wrap">
-    <div class="presets-label">⚡ Protocoles prédéfinis</div>
+    <div class="presets-label"><svg class="ic" style="width:.8em;height:.8em"><use href="#i-bolt"/></svg> Protocoles prédéfinis</div>
     <div class="presets-row">
       <button class="btn-preset" id="presetTabata" onclick="applyPreset('tabata')">
         <span class="btn-preset-name">TABATA</span>
@@ -261,10 +299,10 @@ if('serviceWorker' in navigator){
   </div>
 
   <div class="start-wrap">
-    <button class="btn-start" onclick="startTimer()">▶ DÉMARRER</button>
+    <button class="btn-start" onclick="startTimer()"><svg class="ic"><use href="#i-play"/></svg> Démarrer</button>
   </div>
 
-  <div class="footer">Créé avec ❤️ par <a href="https://www.seb-run-nature.com/" target="_blank">Seb Run Nature</a></div>
+  <div class="footer">Par <a href="https://www.run-nature.com/" target="_blank">Run Nature</a></div>
 </div>
 
 <!-- PAGE TIMER -->
@@ -292,121 +330,88 @@ if('serviceWorker' in navigator){
     </div>
 
     <div class="controls">
-      <button class="btn-ctrl" onclick="resetTimer()">↩ Reset</button>
-      <button class="btn-ctrl primary" id="btnPause" onclick="togglePause()">⏸ PAUSE</button>
-      <button class="btn-ctrl" onclick="skipPhase()">⏭ Skip</button>
+      <button class="btn-ctrl" onclick="resetTimer()"><svg class="ic"><use href="#i-back"/></svg> Reset</button>
+      <button class="btn-ctrl primary" id="btnPause" onclick="togglePause()"><svg class="ic"><use href="#i-pause"/></svg> Pause</button>
+      <button class="btn-ctrl" onclick="skipPhase()"><svg class="ic"><use href="#i-skip"/></svg> Skip</button>
     </div>
   </div>
 
-  <div class="footer">Créé avec ❤️ par <a href="https://www.seb-run-nature.com/" target="_blank">Seb Run Nature</a></div>
+  <div class="footer">Par <a href="https://www.run-nature.com/" target="_blank">Run Nature</a></div>
 </div>
 
 <!-- PAGE FINISH -->
 <div class="page" id="pageFinish">
   <div class="finish-screen">
-    <div class="finish-icon">🏔️</div>
+    <div class="finish-icon"><svg width="56" height="56" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="22" cy="22" r="22" fill="rgba(93,202,165,.14)"/><path d="M11 30 L19 17 L24 23 L29 13 L33 30 Z" fill="none" stroke="#5dcaa5" stroke-width="2.2" stroke-linejoin="round"/><circle cx="29" cy="13" r="2.4" fill="#5dcaa5"/></svg></div>
     <div class="finish-title">SÉANCE TERMINÉE !</div>
     <div class="finish-stat" id="finishStat"></div>
     <div class="controls" style="width:100%;max-width:360px">
-      <button class="btn-ctrl primary" style="flex:1" onclick="resetTimer()">↩ CONFIG</button>
-      <button class="btn-ctrl primary" style="flex:1" onclick="restartTimer()">🔄 RECOMMENCER</button>
+      <button class="btn-ctrl primary" style="flex:1" onclick="resetTimer()"><svg class="ic"><use href="#i-back"/></svg> Config</button>
+      <button class="btn-ctrl primary" style="flex:1" onclick="restartTimer()"><svg class="ic"><use href="#i-refresh"/></svg> Recommencer</button>
     </div>
   </div>
-  <div class="footer">Créé avec ❤️ par <a href="https://www.seb-run-nature.com/" target="_blank">Seb Run Nature</a></div>
+  <div class="footer">Par <a href="https://www.run-nature.com/" target="_blank">Run Nature</a></div>
 </div>
 
 <script>
-const CITATIONS=[
-{t:"Le sport va chercher la peur pour la dominer, la fatigue pour en triompher, la difficulté pour la vaincre.",a:"Pierre de Coubertin"},
-{t:"Si tu veux courir, cours un kilomètre. Si tu veux changer ta vie, cours un marathon.",a:"Emil Zátopek"},
-{t:"Il faut se fixer des buts avant de pouvoir les atteindre.",a:"Michael Jordan"},
-{t:"Le sport est dépassement de soi. Le sport est école de vie.",a:"Aimé Jacquet"},
-{t:"Nous aimons tous gagner, mais combien aiment s'entraîner ?",a:"Mark Spitz"},
-{t:"La discipline l'emporte sur la motivation. C'est ce qui reste quand la motivation s'en va.",a:"Inconnu"},
-{t:"La douleur est temporaire. La fierté est pour toujours.",a:"Inconnu"},
-{t:"Ton corps peut supporter presque tout. C'est ton esprit qu'il faut convaincre.",a:"Inconnu"},
-{t:"Chaque entraînement te rapproche de ton objectif final.",a:"Inconnu"},
-{t:"Sois plus fort que tes excuses.",a:"Inconnu"},
-{t:"La victoire commence dans l'esprit.",a:"Inconnu"},
-{t:"Ne rêve pas de succès, entraîne-toi pour l'atteindre.",a:"Usain Bolt"},
-{t:"Je ne perds jamais, soit je gagne, soit j'apprends.",a:"Nelson Mandela"},
-{t:"La limite n'existe que dans ta tête.",a:"Inconnu"},
-{t:"Quand tu penses abandonner, souviens-toi pourquoi tu as commencé.",a:"Inconnu"},
-{t:"La sueur est juste de la graisse qui pleure.",a:"Inconnu"},
-{t:"Un champion est quelqu'un qui se relève quand il ne peut plus.",a:"Jack Dempsey"},
-{t:"Le travail acharné bat le talent quand le talent ne travaille pas.",a:"Tim Notke"},
-{t:"La seule mauvaise séance d'entraînement est celle qui n'a pas eu lieu.",a:"Inconnu"},
-{t:"Ne compte pas les jours, fais que chaque jour compte.",a:"Muhammad Ali"},
-{t:"La victoire appartient au plus persévérant.",a:"Napoléon Bonaparte"},
-{t:"Le corps atteint ce que l'esprit croit.",a:"Inconnu"},
-{t:"Pas d'excuses, juste des résultats.",a:"Inconnu"},
-{t:"Les champions ne naissent pas, ils se construisent.",a:"Inconnu"},
-{t:"L'entraînement ne devient pas plus facile, c'est toi qui deviens plus fort.",a:"Inconnu"},
-{t:"Vous ne perdez pas si vous tombez ; vous perdez si vous restez à terre.",a:"Muhammad Ali"},
-{t:"La force ne vient pas du fait de gagner. Tes luttes développent tes points forts.",a:"Serena Williams"},
-{t:"Tomber a été inventé pour se relever. Malheur à ceux qui ne tombent jamais.",a:"Félix Leclerc"},
-{t:"Notre plus grande gloire n'est pas de ne jamais tomber, mais de nous relever chaque fois.",a:"Nelson Mandela"},
-{t:"Ils ne savaient pas que c'était impossible alors ils l'ont fait.",a:"Mark Twain"},
-{t:"Là où se trouve une volonté, il existe un chemin.",a:"Winston Churchill"},
-{t:"La persévérance transforme l'impossible en possible.",a:"Inconnu"},
-{t:"Chaque défi sur le terrain est une opportunité de grandir.",a:"Inconnu"},
-{t:"Le talent sans travail est comme une voiture de course sans carburant.",a:"Inconnu"},
-{t:"Transforme tes faiblesses en force — c'est la clé de la progression.",a:"Inconnu"},
-{t:"Ce que tu fais aujourd'hui peut améliorer tous tes lendemains.",a:"Ralph Marston"},
-{t:"80 % du succès consiste à se présenter.",a:"Woody Allen"},
-{t:"Vole comme le papillon, pique comme l'abeille.",a:"Muhammad Ali"},
-{t:"Il faut croire en soi, ne jamais renoncer.",a:"Inconnu"},
-{t:"Dans le sport, il n'y a pas de mensonge.",a:"Joakim Noah"}
-];
-
-const SESSION_CIT=CITATIONS[Math.floor(Math.random()*CITATIONS.length)];
-function applyCitation(){
-  const t=`« ${SESSION_CIT.t} »`,a=`— ${SESSION_CIT.a}`;
-  document.getElementById('cfgCitText').textContent=t;
-  document.getElementById('cfgCitAuthor').textContent=a;
-}
 
 /* ── MODE JOUR / NUIT ─── */
-let lightMode=false;
+let lightMode = localStorage.getItem('minuteurTheme') === 'light';
 function toggleTheme(){
   lightMode=!lightMode;
   document.body.classList.toggle('light',lightMode);
-  document.getElementById('btnTheme').textContent=lightMode?'🌙':'☀️';
+  document.getElementById('btnTheme').innerHTML = lightMode
+    ? '<svg class="ic"><use href="#i-moon"/></svg>'
+    : '<svg class="ic"><use href="#i-sun"/></svg>';
+  localStorage.setItem('minuteurTheme', lightMode ? 'light' : 'dark');
+}
+// Appliquer le thème sauvegardé au chargement
+if(lightMode){
+  document.body.classList.add('light');
 }
 
 /* ── PLEIN ÉCRAN ─────── */
 function toggleFullscreen(){
   if(!document.fullscreenElement){
     document.documentElement.requestFullscreen().catch(()=>{});
-    document.getElementById('btnFs').textContent='✕';
+    document.getElementById('fsIcon').innerHTML='<use href="#i-collapse"/>';
   } else {
     document.exitFullscreen();
-    document.getElementById('btnFs').textContent='⛶';
+    document.getElementById('fsIcon').innerHTML='<use href="#i-expand"/>';
   }
 }
 document.addEventListener('fullscreenchange',()=>{
-  if(!document.fullscreenElement) document.getElementById('btnFs').textContent='⛶';
+  if(!document.fullscreenElement) document.getElementById('fsIcon').innerHTML='<use href="#i-expand"/>';
 });
 
-let soundOn=true,audioCtx=null;
+let soundOn = localStorage.getItem('minuteurSound') !== 'off';
+let audioCtx=null;
 function getAudio(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();return audioCtx;}
 function beep(f,d,v=0.3){if(!soundOn)return;try{const c=getAudio(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(v,c.currentTime);g.gain.exponentialRampToValueAtTime(0.001,c.currentTime+d);o.start(c.currentTime);o.stop(c.currentTime+d);}catch(e){}}
 function bipStart(){beep(880,.12,.35);setTimeout(()=>beep(880,.12,.35),150);setTimeout(()=>beep(1100,.2,.4),300);}
 function bipEnd(){beep(1100,.15,.4);setTimeout(()=>beep(880,.15,.35),180);}
 function bipFinish(){[0,180,360,540].forEach(d=>setTimeout(()=>beep(1320,.18,.4),d));}
 function bipCountdown(){beep(660,.1,.25);}
-function toggleSound(){soundOn=!soundOn;document.getElementById('btnSound').textContent=soundOn?'🔊':'🔇';document.getElementById('btnSound').classList.toggle('on',soundOn);document.getElementById('trackSon').classList.toggle('on',soundOn);}
+function toggleSound(){
+  soundOn=!soundOn;
+  document.getElementById('soundIcon').innerHTML = soundOn ? '<use href="#i-volume"/>' : '<use href="#i-volume-off"/>';
+  document.getElementById('btnSound').classList.toggle('on',soundOn);
+  document.getElementById('trackSon').classList.toggle('on',soundOn);
+  localStorage.setItem('minuteurSound', soundOn ? 'on' : 'off');
+}
 
 /* ── ANNONCES VOCALES ────────────────────────────────── */
-let voiceOn=true;
+let voiceOn = localStorage.getItem('minuteurVoice') !== 'off';
 let voiceLang='fr-FR';
 let speechSynth=window.speechSynthesis;
 
 function toggleVoice(){
   voiceOn=!voiceOn;
+  document.getElementById('voiceIcon').innerHTML = voiceOn ? '<use href="#i-mic"/>' : '<use href="#i-mic-off"/>';
   document.getElementById('btnVoice').classList.toggle('on',voiceOn);
   document.getElementById('trackVoice').classList.toggle('on',voiceOn);
   if(!voiceOn) speechSynth.cancel();
+  localStorage.setItem('minuteurVoice', voiceOn ? 'on' : 'off');
 }
 
 function speak(text, priority=false){
@@ -485,6 +490,7 @@ function applyPreset(key) {
   }
 
   updateCfgDisplay();
+  saveCfg();
 
   // Highlight bouton actif
   const idMap = {tabata:'Tabata', hiit:'HIIT', cotes:'Cotes', endurance:'Endurance'};
@@ -496,7 +502,18 @@ function applyPreset(key) {
   speak(`Protocole ${p.label} chargé. Prêt à démarrer.`, true);
 }
 
-const cfg={effortSec:20,reposSec:10,exo:8,tours:2,treposSec:60};
+const CFG_DEFAULT = {effortSec:20,reposSec:10,exo:8,tours:2,treposSec:60};
+function loadCfg(){
+  try {
+    const saved = JSON.parse(localStorage.getItem('minuteurCfg'));
+    if(saved && typeof saved === 'object') return {...CFG_DEFAULT, ...saved};
+  } catch(e){}
+  return {...CFG_DEFAULT};
+}
+function saveCfg(){
+  try { localStorage.setItem('minuteurCfg', JSON.stringify(cfg)); } catch(e){}
+}
+const cfg = loadCfg();
 let editingCard=null;
 function fmt(s){const m=Math.floor(s/60),sec=s%60;return String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0');}
 function cap(s){return s.charAt(0).toUpperCase()+s.slice(1);}
@@ -508,6 +525,8 @@ function updateCfgDisplay(){
   document.getElementById('valTours').textContent=cfg.tours;
   document.getElementById('valTrepos').textContent=fmt(cfg.treposSec);
   document.getElementById('totalDur').textContent=fmt((cfg.effortSec+cfg.reposSec)*cfg.exo*cfg.tours+cfg.treposSec*(cfg.tours-1));
+  // "Tour de repos" n'a de sens qu'à partir de 2 tours — masqué sinon pour alléger l'écran
+  document.getElementById('cardTrepos').style.display = cfg.tours >= 2 ? '' : 'none';
 }
 function clearPreset(){
   if(activePreset){
@@ -535,6 +554,7 @@ function saveCard(id){
   if(id==='trepos')cfg.treposSec=(+document.getElementById('inTreposMin').value||0)*60+(+document.getElementById('inTreposSec').value||0);
   if(!cfg.effortSec)cfg.effortSec=5;
   updateCfgDisplay();
+  saveCfg();
 }
 function spin(card,field,delta,e){
   e.stopPropagation();saveCard(card);
@@ -545,6 +565,33 @@ function spin(card,field,delta,e){
 }
 
 let state=null,interval=null,paused=false;
+
+/* ── WAKE LOCK — empêche l'écran de s'éteindre pendant la séance ── */
+let wakeLock = null;
+async function requestWakeLock(){
+  try {
+    if('wakeLock' in navigator){
+      wakeLock = await navigator.wakeLock.request('screen');
+      wakeLock.addEventListener('release', () => { wakeLock = null; });
+    }
+  } catch(e){
+    // Wake Lock non supporté ou refusé — l'app continue de fonctionner normalement
+    console.warn('Wake Lock indisponible :', e);
+  }
+}
+function releaseWakeLock(){
+  if(wakeLock){
+    wakeLock.release().catch(()=>{});
+    wakeLock = null;
+  }
+}
+// Ré-acquérir le wake lock si l'onglet redevient visible pendant une séance active
+document.addEventListener('visibilitychange', () => {
+  if(document.visibilityState === 'visible' && state && !paused){
+    requestWakeLock();
+  }
+});
+
 function showPage(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('page'+cap(id)).classList.add('active');}
 function buildState(){
   if(editingCard){saveCard(editingCard);document.getElementById('val'+cap(editingCard)).style.display='';document.getElementById('edit'+cap(editingCard)).style.display='none';document.getElementById('card'+cap(editingCard)).classList.remove('editing');editingCard=null;}
@@ -568,8 +615,9 @@ function startTimer() {
     renderTimer();
     bipStart();
     announceStart();
+    requestWakeLock();
     interval = setInterval(tick, 1000);
-    document.getElementById('btnPause').textContent = '⏸ PAUSE';
+    document.getElementById('btnPause').innerHTML = '<svg class="ic"><use href="#i-pause"/></svg> Pause';
 }
 function tick(){
   if(paused||!state)return;
@@ -592,7 +640,7 @@ function renderTimer(){
   document.body.classList.remove('phase-effort','phase-repos','phase-trepos');
   document.body.classList.add('phase-'+ph);
   const lbl=document.getElementById('phaseLabel');
-  lbl.textContent={effort:'🔥 EFFORT',repos:'😮‍💨 REPOS',trepos:'⏱ TOUR DE REPOS'}[ph];
+  lbl.textContent={effort:'Effort',repos:'Repos',trepos:'Tour de repos'}[ph];
   lbl.className='phase-label '+ph;
   const ring=document.getElementById('ringFill');
   ring.className='ring-fill '+ph;
@@ -607,20 +655,26 @@ function renderTimer(){
 }
 function togglePause(){
   paused=!paused;
-  document.getElementById('btnPause').textContent=paused?'▶ REPRENDRE':'⏸ PAUSE';
+  const btn = document.getElementById('btnPause');
+  btn.innerHTML = paused
+    ? '<svg class="ic"><use href="#i-play"/></svg> Reprendre'
+    : '<svg class="ic"><use href="#i-pause"/></svg> Pause';
   if(paused){
     speechSynth.cancel();
     speak('Pause');
+    releaseWakeLock();
   } else {
     bipStart();
     speak('Reprise !', true);
+    requestWakeLock();
   }
 }
 function showFinish(){
   clearInterval(interval);
   speechSynth.cancel();
+  releaseWakeLock();
   document.body.classList.remove('phase-effort','phase-repos','phase-trepos');
-  document.getElementById('finishStat').textContent=`${cfg.exo} exercices × ${cfg.tours} tours — Bien joué ! 💪`;
+  document.getElementById('finishStat').textContent=`${cfg.exo} exercices × ${cfg.tours} tours — Bien joué !`;
   showPage('finish');
   bipFinish();
   setTimeout(()=>announceFinish(), 800);
@@ -640,13 +694,14 @@ function skipPhase(){
 function resetTimer() {
     clearInterval(interval);
     speechSynth.cancel();
+    releaseWakeLock();
     state = null;
     interval = null;
     paused = false;
     document.body.classList.remove('phase-effort','phase-repos','phase-trepos');
     showPage('config');
     updateCfgDisplay();
-    document.getElementById('btnPause').textContent = '⏸ PAUSE';
+    document.getElementById('btnPause').innerHTML = '<svg class="ic"><use href="#i-pause"/></svg> Pause';
 }
 function restartTimer() {
     clearInterval(interval);
@@ -657,16 +712,24 @@ function restartTimer() {
     document.body.classList.remove('phase-effort','phase-repos','phase-trepos');
     startTimer();
 }
-function showFinish(){
-  clearInterval(interval);
-  document.body.classList.remove('phase-effort','phase-repos','phase-trepos');
-  document.getElementById('finishStat').textContent=`${cfg.exo} exercices × ${cfg.tours} tours — Bien joué ! 💪`;
-  showPage('finish');
-  bipFinish();
+
+function syncPersistedUI(){
+  // Son
+  document.getElementById('soundIcon').innerHTML = soundOn ? '<use href="#i-volume"/>' : '<use href="#i-volume-off"/>';
+  document.getElementById('btnSound').classList.toggle('on', soundOn);
+  document.getElementById('trackSon').classList.toggle('on', soundOn);
+  // Voix
+  document.getElementById('voiceIcon').innerHTML = voiceOn ? '<use href="#i-mic"/>' : '<use href="#i-mic-off"/>';
+  document.getElementById('btnVoice').classList.toggle('on', voiceOn);
+  document.getElementById('trackVoice').classList.toggle('on', voiceOn);
+  // Thème — icône = action à venir (lune si on est en clair, soleil si on est en sombre)
+  document.getElementById('btnTheme').innerHTML = lightMode
+    ? '<svg class="ic"><use href="#i-moon"/></svg>'
+    : '<svg class="ic"><use href="#i-sun"/></svg>';
 }
+document.addEventListener('DOMContentLoaded', syncPersistedUI);
 
 updateCfgDisplay();
-applyCitation();
 document.addEventListener('click',e=>{if(editingCard&&!e.target.closest('#card'+cap(editingCard))){saveCard(editingCard);document.getElementById('val'+cap(editingCard)).style.display='';document.getElementById('edit'+cap(editingCard)).style.display='none';document.getElementById('card'+cap(editingCard)).classList.remove('editing');editingCard=null;}},true);
 document.querySelectorAll('.cfg-input').forEach(i=>i.addEventListener('input',()=>{if(editingCard)saveCard(editingCard);}));
 </script>
