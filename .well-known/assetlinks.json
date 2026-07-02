@@ -1,0 +1,10 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "io.github.sebrunnature.minuteurhiit",
+      "sha256_cert_fingerprints": ["0A:99:63:F1:6F:F6:B4:7D:99:BA:D4:2D:CD:56:07:00:BD:5D:06:4C:09:38:CC:00:AE:37:8E:71:AD:3F:79:CD"]
+    }
+  }
+]
