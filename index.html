@@ -661,7 +661,7 @@ function applyPreset(key) {
 let appMode = localStorage.getItem('minuteurMode') || 'hiit'; // 'hiit' | 'trail'
 let terrainProfile = localStorage.getItem('terrainProfile') || 'tapis'; // 'tapis' | 'vallonne' | 'plat'
 
-const TRAIL_DEFAULT = { monteeSec:180, platSec:120, descenteSec:120, marcheSec:60, tours:4, dist:10, dplus:350 };
+const TRAIL_DEFAULT = { monteeSec:180, platSec:120, descenteSec:120, marcheSec:60, tours:4, dist:10, dplus:350, inclineMontee:7, isSeche:false };
 function loadTrail(){
   try {
     const saved = JSON.parse(localStorage.getItem('minuteurTrail'));
@@ -678,31 +678,30 @@ let hasTrailSeq = localStorage.getItem('minuteurTrailGenerated') === 'yes';
 // Messages vocaux selon le profil de terrain choisi
 const TERRAIN_MSG = {
   tapis: {
-    montee:   () => `Montée. Passe l'inclinaison à ${inclinePercent(trail.monteeSec/60)} pour cent.`,
+    montee:   () => trail.isSeche
+      ? `Montée sèche. Marche rapide, inclinaison à ${trail.inclineMontee} pour cent.`
+      : `Montée. Passe l'inclinaison à ${trail.inclineMontee} pour cent.`,
     plat:     () => `Plat. Inclinaison à zéro.`,
     descente: () => `Descente. Redescends l'inclinaison à un pour cent.`,
     marche:   () => `Marche récupération.`
   },
   vallonne: {
-    montee:   () => `Montée. Prends une côte si tu en as une, sinon pousse l'allure.`,
+    montee:   () => trail.isSeche
+      ? `Montée sèche. Marche rapide obligatoire si tu as une vraie côte, sinon accélère fort.`
+      : `Montée. Prends une côte si tu en as une, sinon pousse l'allure.`,
     plat:     () => `Terrain plat. Allure normale.`,
     descente: () => `Descente. Relâche si tu es en pente, sinon récupération active.`,
     marche:   () => `Marche récupération.`
   },
   plat: {
-    montee:   () => `Montée simulée. Accélère nettement.`,
+    montee:   () => trail.isSeche
+      ? `Montée sèche simulée. Sprint court et très intense.`
+      : `Montée simulée. Accélère nettement.`,
     plat:     () => `Plat. Reviens à ton allure normale.`,
     descente: () => `Descente simulée. Relâche complètement, récupération active.`,
     marche:   () => `Marche récupération.`
   }
 };
-
-function inclinePercent(monteeMin){
-  if(monteeMin <= 2) return 5;
-  if(monteeMin <= 3) return 7;
-  if(monteeMin <= 4) return 9;
-  return 11;
-}
 
 function switchMode(mode){
   appMode = mode;
@@ -715,7 +714,7 @@ function switchMode(mode){
 }
 
 const TERRAIN_INFO = {
-  tapis: () => `<b>Sur tapis :</b> Montée → augmente l'inclinaison (${inclinePercent(trail.monteeSec/60)}% actuellement) · Plat → inclinaison 0% · Descente → inclinaison 1% · Marche récup → pas d'inclinaison.`,
+  tapis: () => `<b>Sur tapis :</b> ${trail.isSeche ? 'Montée sèche' : 'Montée'} → augmente l'inclinaison (${trail.inclineMontee}% actuellement) · Plat → inclinaison 0% · Descente → inclinaison 1% · Marche récup → pas d'inclinaison.${trail.isSeche ? ' Profil très raide : la montée passe en marche rapide, segments courts et plus nombreux.' : ''}`,
   vallonne: () => `<b>Terrain vallonné :</b> Montée → prends une vraie côte si tu en as une, sinon accélère · Plat → allure normale · Descente → profite de la pente ou récupère activement · Marche récup → marche lente.`,
   plat: () => `<b>Fartlek structuré</b> (aucun relief nécessaire) : Montée → accélère nettement · Plat → allure normale, moins rapide · Descente → relâche, récupération active · Marche récup → marche lente.`
 };
@@ -736,11 +735,23 @@ function generateTrailSequence(){
   const dplus = Math.max(0, +document.getElementById('genDplus').value || 0);
   const ratio = dplus / dist; // m/km — intensité du dénivelé
 
-  const monteeMin   = Math.min(6, Math.max(2, Math.round(ratio/15)));
+  // Paliers d'intensité : au-delà d'un certain ratio, une montée réelle devient
+  // trop raide pour être courue en continu — elle se transforme en portions
+  // courtes et très inclinées, façon marche rapide / montée sèche.
+  let monteeMin, inclineMontee, isSeche;
+  if(ratio < 20)       { monteeMin=2; inclineMontee=5;  isSeche=false; }
+  else if(ratio < 60)  { monteeMin=3; inclineMontee=7;  isSeche=false; }
+  else if(ratio < 100) { monteeMin=4; inclineMontee=9;  isSeche=false; }
+  else if(ratio < 150) { monteeMin=3; inclineMontee=12; isSeche=false; }
+  else                 { monteeMin=2; inclineMontee=15; isSeche=true;  }
+
   const descenteMin = Math.max(1, Math.round(monteeMin*0.7));
   const platMin      = 2;
-  const marcheMin     = 1;
-  const tours = Math.min(8, Math.max(3, Math.round(dist/2.5)));
+  const marcheMin    = 1;
+  // Montée sèche : segments courts mais répétés plus souvent pour garder le volume
+  const tours = isSeche
+    ? Math.min(10, Math.max(4, Math.round(dist/1.5)))
+    : Math.min(8, Math.max(3, Math.round(dist/2.5)));
 
   trail.dist=dist; trail.dplus=dplus;
   trail.monteeSec = monteeMin*60;
@@ -748,12 +759,15 @@ function generateTrailSequence(){
   trail.platSec = platMin*60;
   trail.marcheSec = marcheMin*60;
   trail.tours = tours;
+  trail.inclineMontee = inclineMontee;
+  trail.isSeche = isSeche;
   saveTrail();
   hasTrailSeq = true;
   localStorage.setItem('minuteurTrailGenerated','yes');
 
   renderTrailPreview();
-  speak(`Séance générée. ${tours} tours, montée de ${monteeMin} minutes.`, true);
+  const label = isSeche ? 'Montée sèche' : 'Montée';
+  speak(`Séance générée. ${tours} tours, ${label} de ${monteeMin} minutes à ${inclineMontee} pour cent.`, true);
 }
 
 function renderTrailPreview(){
@@ -767,7 +781,7 @@ function renderTrailPreview(){
 
   const isTapis = terrainProfile === 'tapis';
   const segs = [
-    {type:'montee',   name:'Montée',       sec:trail.monteeSec,   incline: isTapis ? `${inclinePercent(trail.monteeSec/60)}%` : null},
+    {type:'montee',   name: trail.isSeche ? 'Montée sèche' : 'Montée', sec:trail.monteeSec, incline: isTapis ? `${trail.inclineMontee}%` : null},
     {type:'plat',     name:'Plat',         sec:trail.platSec,     incline: isTapis ? '0%' : null},
     {type:'descente', name:'Descente',     sec:trail.descenteSec, incline: isTapis ? '1%' : null},
     {type:'marche',   name:'Marche récup', sec:trail.marcheSec,   incline: null},
@@ -955,7 +969,8 @@ function renderTimer(){
   document.body.classList.add('phase-'+ph);
   const lbl=document.getElementById('phaseLabel');
   const PHASE_LABELS={effort:'Effort',repos:'Repos',trepos:'Tour de repos',montee:'Montée',plat:'Plat',descente:'Descente',marche:'Marche récup'};
-  lbl.textContent=s.label || PHASE_LABELS[ph] || ph;
+  const monteeLabel = (ph==='montee' && appMode==='trail' && trail.isSeche) ? 'Montée sèche' : PHASE_LABELS[ph];
+  lbl.textContent=s.label || monteeLabel || ph;
   lbl.className='phase-label '+ph;
   const ring=document.getElementById('ringFill');
   ring.className='ring-fill '+ph;
@@ -969,7 +984,7 @@ function renderTimer(){
     if(s.label){
       sub=s.label;
     } else if(terrainProfile==='tapis' && (ph==='montee'||ph==='descente')){
-      sub=`Inclinaison ${ph==='montee' ? inclinePercent(trail.monteeSec/60) : 1}%`;
+      sub=`Inclinaison ${ph==='montee' ? trail.inclineMontee : 1}%`;
     } else {
       sub={montee:'Effort soutenu',plat:'Allure normale',descente:'Récupération active',marche:'Marche'}[ph]||'';
     }
