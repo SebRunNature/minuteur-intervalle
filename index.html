@@ -111,6 +111,7 @@ body.phase-marche{background:var(--trepos-bg)}
 .seg-dot.descente{background:#3a7bd5}
 .seg-dot.marche{background:#e8a020}
 .seg-name{font-weight:600;font-size:.84rem;color:var(--text);flex:1}
+.seg-incline{font-family:var(--font-display);font-weight:700;font-size:.76rem;color:var(--muted);background:var(--card2);border-radius:6px;padding:3px 8px;margin-right:4px}
 .seg-dur{font-family:var(--font-display);font-weight:700;font-size:.9rem;color:var(--green-bright)}
 .trail-empty{text-align:center;padding:24px 12px;color:var(--muted);font-size:.82rem}
 .presets-label{font-size:.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:8px}
@@ -727,6 +728,7 @@ function setTerrainProfile(p){
     document.getElementById('terrain'+id).classList.toggle('active', key === p);
   });
   document.getElementById('terrainInfo').innerHTML = TERRAIN_INFO[p]();
+  if(hasTrailSeq) renderTrailPreview();
 }
 
 function generateTrailSequence(){
@@ -763,16 +765,18 @@ function renderTrailPreview(){
 
   document.getElementById('trailPreviewTitle').textContent = `Séquence générée — ${trail.tours} tours`;
 
+  const isTapis = terrainProfile === 'tapis';
   const segs = [
-    {type:'montee',   name:'Montée',       sec:trail.monteeSec},
-    {type:'plat',     name:'Plat',         sec:trail.platSec},
-    {type:'descente', name:'Descente',     sec:trail.descenteSec},
-    {type:'marche',   name:'Marche récup', sec:trail.marcheSec},
+    {type:'montee',   name:'Montée',       sec:trail.monteeSec,   incline: isTapis ? `${inclinePercent(trail.monteeSec/60)}%` : null},
+    {type:'plat',     name:'Plat',         sec:trail.platSec,     incline: isTapis ? '0%' : null},
+    {type:'descente', name:'Descente',     sec:trail.descenteSec, incline: isTapis ? '1%' : null},
+    {type:'marche',   name:'Marche récup', sec:trail.marcheSec,   incline: null},
   ];
   list.innerHTML = segs.map(s => `
     <div class="seg-row">
       <div class="seg-dot ${s.type}"></div>
       <div class="seg-name">${s.name}</div>
+      ${s.incline ? `<div class="seg-incline">${s.incline}</div>` : ''}
       <div class="seg-dur">${fmt(s.sec)}</div>
     </div>
   `).join('');
@@ -1057,11 +1061,10 @@ updateCfgDisplay();
 
 /* ── Init Mode Trail : restaurer l'état persisté ── */
 document.addEventListener('DOMContentLoaded', () => {
-  switchMode(appMode);
-  setTerrainProfile(terrainProfile);
   document.getElementById('genDist').value = trail.dist;
   document.getElementById('genDplus').value = trail.dplus;
-  if(hasTrailSeq) renderTrailPreview();
+  switchMode(appMode);
+  setTerrainProfile(terrainProfile); // met aussi à jour l'aperçu si une séquence existe déjà
 });
 
 document.addEventListener('click',e=>{if(editingCard&&!e.target.closest('#card'+cap(editingCard))){saveCard(editingCard);document.getElementById('val'+cap(editingCard)).style.display='';document.getElementById('edit'+cap(editingCard)).style.display='none';document.getElementById('card'+cap(editingCard)).classList.remove('editing');editingCard=null;}},true);
