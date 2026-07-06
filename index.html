@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Minuteur Trail – Run Nature</title>
+<title>Minuteur HIIT — Run Nature</title>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -162,6 +162,23 @@ body.phase-marche{background:var(--trepos-bg)}
 .finish-title{font-family:var(--font-display);font-weight:700;font-size:2rem;letter-spacing:-1px;color:var(--green-bright)}
 .ic{width:1.1em;height:1.1em;display:inline-block;vertical-align:-0.18em;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;fill:none;flex-shrink:0}
 .finish-stat{font-size:.82rem;color:var(--muted);font-weight:700}
+.finish-history{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.finish-history .fh-chip{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px 16px;text-align:center;min-width:88px}
+.fh-chip-val{font-family:var(--font-display);font-weight:700;font-size:1.25rem;color:var(--green-bright);line-height:1.1}
+.fh-chip-lbl{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-top:3px}
+.session-timeline{position:relative;width:100%;max-width:360px;height:12px;border-radius:6px;overflow:hidden;background:var(--card2);border:1px solid var(--border)}
+.tl-segs{display:flex;width:100%;height:100%}
+.tl-seg{height:100%;min-width:1px}
+.tl-seg.effort,.tl-seg.montee{background:var(--green)}
+.tl-seg.repos,.tl-seg.descente{background:#3a7bd5}
+.tl-seg.trepos{background:#7850c8}
+.tl-seg.plat{background:#7d756a}
+.tl-seg.marche{background:#e8a020}
+.tl-seg+.tl-seg{border-left:1px solid rgba(0,0,0,.25)}
+.tl-done{position:absolute;left:0;top:0;bottom:0;width:0%;background:rgba(0,0,0,.45);border-right:2px solid #fff;transition:width .25s linear;pointer-events:none}
+body.light .tl-done{background:rgba(255,255,255,.55);border-right-color:var(--text)}
+@keyframes attention{0%,100%{border-color:var(--border);transform:none}25%{border-color:var(--green);transform:scale(1.015)}60%{border-color:var(--green)}}
+.gen-card.attention{animation:attention .9s ease 2}
 .page{display:none;flex:1;flex-direction:column;overflow-y:auto;min-height:0}
 .page.active{display:flex}
 @media(max-width:380px){.cfg-value{font-size:1.6rem}.timer-big{font-size:3.6rem}.ring-wrap{width:190px;height:190px}}
@@ -444,7 +461,7 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:') {
     <button class="btn-start" onclick="startTimer()"><svg class="ic"><use href="#i-play"/></svg> Démarrer</button>
   </div>
 
-  <div class="footer">Créé avec ❤️ par <a href="https://www.run-nature.com/" target="_blank">Run Nature</a></div>
+  <div class="footer">Créé avec ❤️ par <a href="https://www.run-nature.com/" target="_blank" rel="noopener">Run Nature</a></div>
 </div>
 
 <!-- PAGE TIMER -->
@@ -471,6 +488,12 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:') {
       <div class="prog-chip"><div class="prog-chip-val" id="chipTour">1/2</div><div class="prog-chip-lbl">Tour</div></div>
     </div>
 
+    <!-- Timeline de séance : chaque segment coloré, curseur de progression -->
+    <div class="session-timeline" id="sessionTimeline" aria-hidden="true">
+      <div class="tl-segs" id="tlSegs"></div>
+      <div class="tl-done" id="tlDone"></div>
+    </div>
+
     <div class="controls">
       <button class="btn-ctrl" onclick="resetTimer()"><svg class="ic"><use href="#i-back"/></svg> Reset</button>
       <button class="btn-ctrl primary" id="btnPause" onclick="togglePause()"><svg class="ic"><use href="#i-pause"/></svg> Pause</button>
@@ -478,7 +501,7 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:') {
     </div>
   </div>
 
-  <div class="footer">Créé avec ❤️ par <a href="https://www.run-nature.com/" target="_blank">Run Nature</a></div>
+  <div class="footer">Créé avec ❤️ par <a href="https://www.run-nature.com/" target="_blank" rel="noopener">Run Nature</a></div>
 </div>
 
 <!-- PAGE FINISH -->
@@ -487,12 +510,13 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:') {
     <div class="finish-icon"><svg width="56" height="56" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="22" cy="22" r="22" fill="rgba(93,202,165,.14)"/><path d="M11 30 L19 17 L24 23 L29 13 L33 30 Z" fill="none" stroke="#5dcaa5" stroke-width="2.2" stroke-linejoin="round"/><circle cx="29" cy="13" r="2.4" fill="#5dcaa5"/></svg></div>
     <div class="finish-title">SÉANCE TERMINÉE !</div>
     <div class="finish-stat" id="finishStat"></div>
+    <div class="finish-history" id="finishHistory"></div>
     <div class="controls" style="width:100%;max-width:360px">
       <button class="btn-ctrl primary" style="flex:1" onclick="resetTimer()"><svg class="ic"><use href="#i-back"/></svg> Config</button>
       <button class="btn-ctrl primary" style="flex:1" onclick="restartTimer()"><svg class="ic"><use href="#i-refresh"/></svg> Recommencer</button>
     </div>
   </div>
-  <div class="footer">Créé avec ❤️ par <a href="https://www.run-nature.com/" target="_blank">Run Nature</a></div>
+  <div class="footer">Créé avec ❤️ par <a href="https://www.run-nature.com/" target="_blank" rel="noopener">Run Nature</a></div>
 </div>
 
 <script>
@@ -538,7 +562,7 @@ function bipCountdown(){beep(660,.1,.25);}
 /* ── ANNONCES VOCALES ────────────────────────────────── */
 let voiceOn = localStorage.getItem('minuteurVoice') !== 'off';
 let voiceLang='fr-FR';
-let speechSynth=window.speechSynthesis;
+let speechSynth=window.speechSynthesis || null; // null si WebView sans synthèse vocale
 
 /* ── AUDIO COMBINÉ — carte Son pilote son + voix ── */
 function toggleAudio(){
@@ -547,14 +571,14 @@ function toggleAudio(){
   voiceOn = turningOn;
   document.getElementById('cardSonIcon').innerHTML = turningOn ? '<use href="#i-volume"/>' : '<use href="#i-volume-off"/>';
   document.getElementById('cardSonTrack').classList.toggle('on', turningOn);
-  if(!voiceOn) speechSynth.cancel();
+  if(!voiceOn) if(speechSynth) speechSynth.cancel();
   localStorage.setItem('minuteurSound', turningOn ? 'on' : 'off');
   localStorage.setItem('minuteurVoice', turningOn ? 'on' : 'off');
 }
 
 function speak(text, priority=false){
-  if(!voiceOn || !speechSynth) return;
-  if(priority) speechSynth.cancel();
+  if(!voiceOn || !speechSynth || typeof SpeechSynthesisUtterance === 'undefined') return;
+  if(priority) if(speechSynth) speechSynth.cancel();
   const u = new SpeechSynthesisUtterance(text);
   u.lang = voiceLang;
   u.rate = 1.05;
@@ -608,7 +632,7 @@ function announceFinish(){
 }
 
 // Charger les voix dès que disponibles (nécessaire sur Chrome)
-if(speechSynth.onvoiceschanged !== undefined){
+if(speechSynth && speechSynth.onvoiceschanged !== undefined){
   speechSynth.onvoiceschanged = () => { speechSynth.getVoices(); };
 }
 
@@ -802,11 +826,16 @@ function trailTotalSec(){
   return 300 + perTour*trail.tours + 300; // + échauffement 5min + retour calme 5min
 }
 
+function hiitTotalSec(){
+  // Durée réelle de la séquence : pas de repos après le tout dernier effort
+  const nEffort = cfg.exo*cfg.tours;
+  return cfg.effortSec*nEffort + cfg.reposSec*Math.max(0,nEffort-1) + (cfg.tours>1 ? cfg.treposSec*(cfg.tours-1) : 0);
+}
 function updateTotalDurDisplay(){
   if(appMode==='trail'){
     document.getElementById('totalDur').textContent = hasTrailSeq ? fmt(trailTotalSec()) : '--:--';
   } else {
-    document.getElementById('totalDur').textContent = fmt((cfg.effortSec+cfg.reposSec)*cfg.exo*cfg.tours+cfg.treposSec*(cfg.tours-1));
+    document.getElementById('totalDur').textContent = fmt(hiitTotalSec());
   }
 }
 
@@ -907,8 +936,8 @@ function removeAllPhaseClasses(){
 function buildState(){
   if(editingCard){saveCard(editingCard);document.getElementById('val'+cap(editingCard)).style.display='';document.getElementById('edit'+cap(editingCard)).style.display='none';document.getElementById('card'+cap(editingCard)).classList.remove('editing');editingCard=null;}
 
+  let seq=[];
   if(appMode === 'trail'){
-    const seq=[];
     seq.push({phase:'plat', sec:300, tour:0, exo:0, label:'Échauffement'});
     for(let t=1;t<=trail.tours;t++){
       seq.push({phase:'montee',   sec:trail.monteeSec,   tour:t, exo:1});
@@ -917,22 +946,39 @@ function buildState(){
       seq.push({phase:'marche',   sec:trail.marcheSec,   tour:t, exo:4});
     }
     seq.push({phase:'plat', sec:300, tour:trail.tours+1, exo:0, label:'Retour au calme'});
-    return {seq, idx:0, secLeft:seq[0].sec, totalSec: trailTotalSec()};
-  }
-
-  const seq=[];
-  for(let t=1;t<=cfg.tours;t++){
-    for(let e=1;e<=cfg.exo;e++){
-      seq.push({phase:'effort',sec:cfg.effortSec,tour:t,exo:e});
-      if(e<cfg.exo||t<cfg.tours)seq.push({phase:'repos',sec:cfg.reposSec,tour:t,exo:e});
+  } else {
+    for(let t=1;t<=cfg.tours;t++){
+      for(let e=1;e<=cfg.exo;e++){
+        seq.push({phase:'effort',sec:cfg.effortSec,tour:t,exo:e});
+        if(e<cfg.exo||t<cfg.tours)seq.push({phase:'repos',sec:cfg.reposSec,tour:t,exo:e});
+      }
+      if(t<cfg.tours&&cfg.treposSec>0)seq.push({phase:'trepos',sec:cfg.treposSec,tour:t,exo:cfg.exo});
     }
-    if(t<cfg.tours&&cfg.treposSec>0)seq.push({phase:'trepos',sec:cfg.treposSec,tour:t,exo:cfg.exo});
   }
-  return{seq,idx:0,secLeft:seq[0].sec,totalSec:(cfg.effortSec+cfg.reposSec)*cfg.exo*cfg.tours+cfg.treposSec*(cfg.tours-1)};
+  // Un segment de 0 seconde ne doit ni durer 1s ni être annoncé
+  seq = seq.filter(s => s.sec > 0);
+  // Sommes suffixes : restAfter[i] = secondes restantes APRÈS le segment i
+  const restAfter = new Array(seq.length).fill(0);
+  for(let i=seq.length-2;i>=0;i--) restAfter[i] = restAfter[i+1] + seq[i+1].sec;
+  const grandTotal = seq.reduce((a,s)=>a+s.sec,0);
+  return {seq, idx:0, secLeft:seq[0].sec, restAfter, grandTotal, totalSec:grandTotal, endAt:0};
 }
+/* ── VIBRATIONS — feedback silencieux (poche, volume coupé) ── */
+function vib(pattern){
+  try{ if(navigator.vibrate) navigator.vibrate(pattern); }catch(e){}
+}
+
 function startTimer() {
     if(appMode === 'trail' && !hasTrailSeq){
       speak('Génère une séance avant de démarrer.', true);
+      // Feedback visuel même sans le son : on attire l'œil sur le générateur
+      const gen = document.querySelector('.gen-card');
+      if(gen){
+        gen.classList.remove('attention'); void gen.offsetWidth;
+        gen.classList.add('attention');
+        gen.scrollIntoView({behavior:'smooth', block:'center'});
+      }
+      vib([60,50,60]);
       return;
     }
     if (interval) {
@@ -940,31 +986,57 @@ function startTimer() {
     }
     paused = false;
     state = buildState();
+    state.endAt = Date.now() + state.secLeft*1000;
+    buildTimeline();
     showPage('timer');
     renderTimer();
     bipStart();
+    vib([80,60,80]);
     announceStart();
     requestWakeLock();
-    interval = setInterval(tick, 1000);
+    // Tick fréquent + calcul sur horloge réelle : zéro dérive, même après
+    // un passage en arrière-plan (Android throttle les intervals)
+    interval = setInterval(tick, 250);
     document.getElementById('btnPause').innerHTML = '<svg class="ic"><use href="#i-pause"/></svg> Pause';
 }
 function tick(){
   if(paused||!state)return;
-  state.secLeft--;state.totalSec=Math.max(0,state.totalSec-1);
-  if(state.secLeft<=3&&state.secLeft>0){bipCountdown();announceCountdown(state.secLeft);}
-  if(state.secLeft<=0){
+  const now = Date.now();
+  const startIdx = state.idx;
+  let rem = Math.ceil((state.endAt - now)/1000);
+  // Rattrapage : si l'app était en arrière-plan, on avance autant de segments que nécessaire
+  while(rem <= 0){
     bipEnd();
     state.idx++;
     if(state.idx>=state.seq.length){showFinish();return;}
-    state.secLeft=state.seq[state.idx].sec;
-    bipStart();
-    announcePhase(state.seq[state.idx].phase, state.seq[state.idx]);
+    state.endAt += state.seq[state.idx].sec*1000;
+    rem = Math.ceil((state.endAt - now)/1000);
+    if(rem > 0){ // on n'annonce que le segment sur lequel on atterrit réellement
+      bipStart();
+      vib([80,60,80]);
+      announcePhase(state.seq[state.idx].phase, state.seq[state.idx]);
+    }
   }
-  renderTimer();
+  if(rem !== state.secLeft || state.idx !== startIdx){
+    state.secLeft = rem;
+    state.totalSec = rem + state.restAfter[state.idx];
+    if(rem<=3&&rem>0){bipCountdown();announceCountdown(rem);vib(35);}
+    renderTimer();
+  }
+}
+function buildTimeline(){
+  if(!state)return;
+  document.getElementById('tlSegs').innerHTML = state.seq.map(s =>
+    `<div class="tl-seg ${s.phase}" style="width:${(s.sec/state.grandTotal*100).toFixed(3)}%"></div>`
+  ).join('');
+  document.getElementById('tlDone').style.width = '0%';
 }
 function renderTimer(){
   if(!state)return;
   const s=state.seq[state.idx],ph=s.phase;
+  // Progression globale sur la timeline
+  const elapsed = state.grandTotal - state.totalSec;
+  document.getElementById('tlDone').style.width = (elapsed/state.grandTotal*100).toFixed(2)+'%';
   removeAllPhaseClasses();
   document.body.classList.add('phase-'+ph);
   const lbl=document.getElementById('phaseLabel');
@@ -1005,42 +1077,79 @@ function togglePause(){
     ? '<svg class="ic"><use href="#i-play"/></svg> Reprendre'
     : '<svg class="ic"><use href="#i-pause"/></svg> Pause';
   if(paused){
-    speechSynth.cancel();
+    if(speechSynth) speechSynth.cancel();
     speak('Pause');
     releaseWakeLock();
+    vib(50);
   } else {
+    // Reprise : on repart du temps restant figé, sur l'horloge réelle
+    if(state) state.endAt = Date.now() + state.secLeft*1000;
     bipStart();
     speak('Reprise !', true);
     requestWakeLock();
+    vib([50,40,50]);
   }
+}
+/* ── HISTORIQUE — séances complétées, persisté localement ── */
+function logSession(durSec){
+  let h=[];
+  try{ h = JSON.parse(localStorage.getItem('minuteurHistory')) || []; }catch(e){}
+  if(!Array.isArray(h)) h=[];
+  h.push({d:Date.now(), m:appMode, s:durSec});
+  while(h.length>300) h.shift();
+  try{ localStorage.setItem('minuteurHistory', JSON.stringify(h)); }catch(e){}
+  return h;
+}
+function fmtLong(sec){
+  const h=Math.floor(sec/3600), m=Math.round((sec%3600)/60);
+  return h>0 ? `${h}h${String(m).padStart(2,'0')}` : `${m} min`;
+}
+function computeStreak(h){
+  // Jours consécutifs (aujourd'hui inclus) avec au moins une séance
+  const days = new Set(h.map(e => new Date(e.d).toDateString()));
+  let streak=0; const day = new Date();
+  while(days.has(day.toDateString())){ streak++; day.setDate(day.getDate()-1); }
+  return streak;
 }
 function showFinish(){
   clearInterval(interval);
-  speechSynth.cancel();
+  if(speechSynth) speechSynth.cancel();
   releaseWakeLock();
   removeAllPhaseClasses();
   document.getElementById('finishStat').textContent = appMode === 'trail'
     ? `${trail.tours} tours de trail — Bien joué !`
     : `${cfg.exo} exercices × ${cfg.tours} tours — Bien joué !`;
+  const hist = logSession(state ? state.grandTotal : 0);
+  const cumul = hist.reduce((a,e)=>a+(e.s||0),0);
+  const streak = computeStreak(hist);
+  document.getElementById('finishHistory').innerHTML = `
+    <div class="fh-chip"><div class="fh-chip-val">${hist.length}</div><div class="fh-chip-lbl">Séance${hist.length>1?'s':''}</div></div>
+    <div class="fh-chip"><div class="fh-chip-val">${fmtLong(cumul)}</div><div class="fh-chip-lbl">Cumulé</div></div>
+    <div class="fh-chip"><div class="fh-chip-val">${streak} j</div><div class="fh-chip-lbl">Série en cours</div></div>`;
   showPage('finish');
   bipFinish();
+  vib([120,80,120,80,300]);
   setTimeout(()=>announceFinish(), 800);
+  state = null; interval = null;
 }
 
 function skipPhase(){
   if(!state)return;
-  speechSynth.cancel();
+  if(speechSynth) speechSynth.cancel();
   state.idx++;
   if(state.idx>=state.seq.length){showFinish();return;}
   state.secLeft=state.seq[state.idx].sec;
+  state.endAt = Date.now() + state.secLeft*1000;
+  state.totalSec = state.secLeft + state.restAfter[state.idx];
   bipStart();
+  vib(60);
   announcePhase(state.seq[state.idx].phase, state.seq[state.idx]);
   renderTimer();
 }
 
 function resetTimer() {
     clearInterval(interval);
-    speechSynth.cancel();
+    if(speechSynth) speechSynth.cancel();
     releaseWakeLock();
     state = null;
     interval = null;
@@ -1052,7 +1161,7 @@ function resetTimer() {
 }
 function restartTimer() {
     clearInterval(interval);
-    speechSynth.cancel();
+    if(speechSynth) speechSynth.cancel();
     state = null;
     interval = null;
     paused = false;
