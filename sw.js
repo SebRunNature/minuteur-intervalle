@@ -1,4 +1,4 @@
-const CACHE = 'srn-minuteur-intervalle-v2.0';
+const CACHE = 'srn-minuteur-intervalle-v2.1';
 const FILES = [
   '/minuteur-intervalle/',
   '/minuteur-intervalle/index.html',
