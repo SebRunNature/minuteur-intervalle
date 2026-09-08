@@ -850,9 +850,15 @@ function trailTotalSec(){
 }
 
 function hiitTotalSec(){
-  // Durée réelle de la séquence : pas de repos après le tout dernier effort
+  // Durée réelle de la séquence : pas de repos après le tout dernier effort.
+  // Entre deux tours, une SEULE pause (tour de repos si défini, sinon repos normal en secours).
   const nEffort = cfg.exo*cfg.tours;
-  return cfg.effortSec*nEffort + cfg.reposSec*Math.max(0,nEffort-1) + (cfg.tours>1 ? cfg.treposSec*(cfg.tours-1) : 0);
+  const withinTourRepos = cfg.tours*(cfg.exo-1); // repos entre exercices d'un même tour
+  const boundaries = cfg.tours>1 ? cfg.tours-1 : 0; // nombre de transitions entre tours
+  const useTrepos = cfg.treposSec>0;
+  const reposCount = withinTourRepos + (useTrepos ? 0 : boundaries);
+  const treposCount = useTrepos ? boundaries : 0;
+  return cfg.effortSec*nEffort + cfg.reposSec*reposCount + cfg.treposSec*treposCount;
 }
 function updateTotalDurDisplay(){
   if(appMode==='trail'){
@@ -977,9 +983,14 @@ function buildState(){
     for(let t=1;t<=cfg.tours;t++){
       for(let e=1;e<=cfg.exo;e++){
         seq.push({phase:'effort',sec:cfg.effortSec,tour:t,exo:e});
-        if(e<cfg.exo||t<cfg.tours)seq.push({phase:'repos',sec:cfg.reposSec,tour:t,exo:e});
+        if(e<cfg.exo)seq.push({phase:'repos',sec:cfg.reposSec,tour:t,exo:e});
       }
-      if(t<cfg.tours&&cfg.treposSec>0)seq.push({phase:'trepos',sec:cfg.treposSec,tour:t,exo:cfg.exo});
+      // Une seule pause entre deux tours : le "tour de repos" s'il est défini,
+      // sinon un repos normal en secours (jamais les deux à la suite).
+      if(t<cfg.tours){
+        if(cfg.treposSec>0) seq.push({phase:'trepos',sec:cfg.treposSec,tour:t,exo:cfg.exo});
+        else seq.push({phase:'repos',sec:cfg.reposSec,tour:t,exo:cfg.exo});
+      }
     }
   }
   // Un segment de 0 seconde ne doit ni durer 1s ni être annoncé
