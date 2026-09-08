@@ -663,6 +663,7 @@ const PRESETS = {
   cotes:     {effortSec:60, reposSec:90,  exo:8,  tours:2, treposSec:90, label:'CÔTES'},
   endurance: {effortSec:180,reposSec:60,  exo:6,  tours:2, treposSec:120,label:'ENDURANCE'},
 };
+const PRESET_ID_MAP = {tabata:'Tabata', hiit:'HIIT', cotes:'Cotes', endurance:'Endurance'};
 
 let activePreset = null;
 
@@ -690,13 +691,25 @@ function applyPreset(key) {
   saveCfg();
 
   // Highlight bouton actif
-  const idMap = {tabata:'Tabata', hiit:'HIIT', cotes:'Cotes', endurance:'Endurance'};
   document.querySelectorAll('.btn-preset').forEach(b => b.classList.remove('active'));
-  document.getElementById('preset'+idMap[key]).classList.add('active');
+  document.getElementById('preset'+PRESET_ID_MAP[key]).classList.add('active');
   activePreset = key;
 
   // Annonce vocale du preset chargé
   speak(`Protocole ${p.label} chargé. Prêt à démarrer.`, true);
+}
+// Réactive le surlignage du preset correspondant si la config chargée
+// (localStorage ou lien partagé) correspond exactement à l'un d'eux —
+// sinon un rechargement de page perd ce surlignage même à réglages identiques.
+function detectActivePreset(){
+  const key = Object.keys(PRESETS).find(k => {
+    const p = PRESETS[k];
+    return p.effortSec===cfg.effortSec && p.reposSec===cfg.reposSec &&
+           p.exo===cfg.exo && p.tours===cfg.tours && p.treposSec===cfg.treposSec;
+  }) || null;
+  document.querySelectorAll('.btn-preset').forEach(b => b.classList.remove('active'));
+  activePreset = key;
+  if(key) document.getElementById('preset'+PRESET_ID_MAP[key]).classList.add('active');
 }
 
 /* ═══════════════════════════════════════════════
@@ -707,6 +720,7 @@ let appMode = localStorage.getItem('minuteurMode') || 'hiit'; // 'hiit' | 'trail
 let terrainProfile = localStorage.getItem('terrainProfile') || 'tapis'; // 'tapis' | 'vallonne' | 'plat'
 
 const TRAIL_DEFAULT = { monteeSec:180, platSec:120, descenteSec:120, marcheSec:60, tours:4, dist:10, dplus:350, inclineMontee:7, isSeche:false };
+const TRAIL_STEPS_PER_TOUR = 4; // montée, plat, descente, marche
 function loadTrail(){
   try {
     const saved = JSON.parse(localStorage.getItem('minuteurTrail'));
@@ -897,8 +911,7 @@ function updateCfgDisplay(){
 }
 function clearPreset(){
   if(activePreset){
-    const idMap = {tabata:'Tabata', hiit:'HIIT', cotes:'Cotes', endurance:'Endurance'};
-    document.getElementById('preset'+idMap[activePreset])?.classList.remove('active');
+    document.getElementById('preset'+PRESET_ID_MAP[activePreset])?.classList.remove('active');
     activePreset=null;
   }
 }
@@ -918,12 +931,14 @@ function editCard(id){
 // (des milliers de tours généreraient aussi des milliers de segments dans la timeline).
 function clamp(v,lo,hi){return Math.max(lo,Math.min(hi,+v||0));}
 function saveCard(id){
-  if(id==='effort')cfg.effortSec=clamp(document.getElementById('inEffortMin').value,0,59)*60+clamp(document.getElementById('inEffortSec').value,0,55);
+  if(id==='effort'){
+    cfg.effortSec=clamp(document.getElementById('inEffortMin').value,0,59)*60+clamp(document.getElementById('inEffortSec').value,0,55);
+    if(!cfg.effortSec)cfg.effortSec=5; // un effort de 0s n'a pas de sens
+  }
   if(id==='repos')cfg.reposSec=clamp(document.getElementById('inReposMin').value,0,59)*60+clamp(document.getElementById('inReposSec').value,0,55);
   if(id==='exo')cfg.exo=clamp(document.getElementById('inExo').value,1,30);
   if(id==='tours')cfg.tours=clamp(document.getElementById('inTours').value,1,20);
   if(id==='trepos')cfg.treposSec=clamp(document.getElementById('inTreposMin').value,0,10)*60+clamp(document.getElementById('inTreposSec').value,0,55);
-  if(!cfg.effortSec)cfg.effortSec=5;
   updateCfgDisplay();
   saveCfg();
 }
@@ -943,7 +958,6 @@ function applySharedLinkParams(){
   if(p.has('trepos')) cfg.treposSec = clamp(p.get('trepos'), 0, 655);
   if(!cfg.effortSec) cfg.effortSec = 5;
   saveCfg();
-  clearPreset();
   appMode = 'hiit';
   document.addEventListener('DOMContentLoaded', () => {
     const hero = document.querySelector('.total-hero');
@@ -1123,7 +1137,7 @@ function renderTimer(){
       sub={montee:'Effort soutenu',plat:'Allure normale',descente:'Récupération active',marche:'Marche'}[ph]||'';
     }
     document.getElementById('timerSub').textContent=sub;
-    document.getElementById('chipExo').textContent = s.exo ? `${s.exo}/4` : '—';
+    document.getElementById('chipExo').textContent = s.exo ? `${s.exo}/${TRAIL_STEPS_PER_TOUR}` : '—';
     document.getElementById('chipTour').textContent = s.tour ? `${s.tour}/${trail.tours}` : '—';
   } else {
     document.getElementById('timerSub').textContent=ph==='effort'?`Exercice ${s.exo} / ${cfg.exo}`:ph==='repos'?'Récupération':'Entre les tours';
@@ -1244,6 +1258,7 @@ function syncPersistedUI(){
 document.addEventListener('DOMContentLoaded', syncPersistedUI);
 
 applySharedLinkParams();
+detectActivePreset();
 updateCfgDisplay();
 
 /* ── Init Mode Trail : restaurer l'état persisté ── */
