@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Minuteur HIIT — Run Nature</title>
 <meta name="description" content="Minuteur d'intervalles HIIT et Trail gratuit, hors ligne et installable sur mobile. Séances Tabata, HIIT, côtes ou trail avec générateur automatique et guidage vocal — par Run Nature.">
 <link rel="canonical" href="https://sebrunnature.github.io/minuteur-intervalle/">
@@ -173,7 +173,6 @@ body.phase-marche{background:var(--trepos-bg)}
 .btn-ctrl{flex:1;padding:13px;border:1px solid var(--border);border-radius:12px;cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:.92rem;letter-spacing:0;transition:all .2s;background:var(--card);color:var(--muted)}
 .btn-ctrl.primary{background:linear-gradient(135deg,var(--green-dk),var(--green));color:#fff;border-color:transparent;box-shadow:0 4px 14px rgba(29,158,117,.25)}
 .btn-ctrl:hover{border-color:var(--green);color:var(--green-bright)}
-.citation-banner{background:var(--card);border-top:1px solid var(--border);padding:11px 18px;flex-shrink:0}
 .footer{flex-shrink:0;padding:9px 18px;border-top:1px solid var(--border);text-align:center;font-size:.72rem;font-weight:700;color:var(--muted);letter-spacing:.3px}
 .footer a{color:var(--green);text-decoration:none}
 .footer a:hover{color:var(--green-bright)}
@@ -482,7 +481,7 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:') {
     <button class="btn-start" onclick="startTimer()"><svg class="ic"><use href="#i-play"/></svg> Démarrer</button>
   </div>
 
-  <div class="footer">Créé avec ❤️ par <a href="https://www.run-nature.com/" target="_blank" rel="noopener">Run Nature</a></div>
+  <div class="footer"><a href="https://www.run-nature.com/" target="_blank" rel="noopener">Run Nature</a></div>
 </div>
 
 <!-- PAGE TIMER -->
@@ -522,7 +521,7 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:') {
     </div>
   </div>
 
-  <div class="footer">Créé avec ❤️ par <a href="https://www.run-nature.com/" target="_blank" rel="noopener">Run Nature</a></div>
+  <div class="footer"><a href="https://www.run-nature.com/" target="_blank" rel="noopener">Run Nature</a></div>
 </div>
 
 <!-- PAGE FINISH -->
@@ -537,7 +536,7 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:') {
       <button class="btn-ctrl primary" style="flex:1" onclick="restartTimer()"><svg class="ic"><use href="#i-refresh"/></svg> Recommencer</button>
     </div>
   </div>
-  <div class="footer">Créé avec ❤️ par <a href="https://www.run-nature.com/" target="_blank" rel="noopener">Run Nature</a></div>
+  <div class="footer"><a href="https://www.run-nature.com/" target="_blank" rel="noopener">Run Nature</a></div>
 </div>
 
 <script>
@@ -907,21 +906,25 @@ function editCard(id){
   if(id==='tours')document.getElementById('inTours').value=cfg.tours;
   if(id==='trepos'){document.getElementById('inTreposMin').value=Math.floor(cfg.treposSec/60);document.getElementById('inTreposSec').value=cfg.treposSec%60;}
 }
+// Bornes alignées sur les attributs min/max des <input> — évite que les flèches
+// ▲▼ ou une saisie manuelle ne fassent dériver la config vers des séances absurdes
+// (des milliers de tours généreraient aussi des milliers de segments dans la timeline).
+function clamp(v,lo,hi){return Math.max(lo,Math.min(hi,+v||0));}
 function saveCard(id){
-  if(id==='effort')cfg.effortSec=(+document.getElementById('inEffortMin').value||0)*60+(+document.getElementById('inEffortSec').value||0);
-  if(id==='repos')cfg.reposSec=(+document.getElementById('inReposMin').value||0)*60+(+document.getElementById('inReposSec').value||0);
-  if(id==='exo')cfg.exo=Math.max(1,+document.getElementById('inExo').value||1);
-  if(id==='tours')cfg.tours=Math.max(1,+document.getElementById('inTours').value||1);
-  if(id==='trepos')cfg.treposSec=(+document.getElementById('inTreposMin').value||0)*60+(+document.getElementById('inTreposSec').value||0);
+  if(id==='effort')cfg.effortSec=clamp(document.getElementById('inEffortMin').value,0,59)*60+clamp(document.getElementById('inEffortSec').value,0,55);
+  if(id==='repos')cfg.reposSec=clamp(document.getElementById('inReposMin').value,0,59)*60+clamp(document.getElementById('inReposSec').value,0,55);
+  if(id==='exo')cfg.exo=clamp(document.getElementById('inExo').value,1,30);
+  if(id==='tours')cfg.tours=clamp(document.getElementById('inTours').value,1,20);
+  if(id==='trepos')cfg.treposSec=clamp(document.getElementById('inTreposMin').value,0,10)*60+clamp(document.getElementById('inTreposSec').value,0,55);
   if(!cfg.effortSec)cfg.effortSec=5;
   updateCfgDisplay();
   saveCfg();
 }
 function spin(card,field,delta,e){
   e.stopPropagation();saveCard(card);
-  if(field==='min'){const i=document.getElementById('in'+cap(card)+'Min');i.value=Math.max(0,(+i.value||0)+delta);}
-  else if(field==='sec'){const i=document.getElementById('in'+Cap2(card)+'Sec');i.value=Math.max(0,Math.min(55,(+i.value||0)+delta));}
-  else if(field==='n'){const m={exo:'inExo',tours:'inTours'};const i=document.getElementById(m[card]);i.value=Math.max(1,(+i.value||0)+delta);}
+  if(field==='min'){const i=document.getElementById('in'+cap(card)+'Min');i.value=clamp((+i.value||0)+delta,0,card==='trepos'?10:59);}
+  else if(field==='sec'){const i=document.getElementById('in'+Cap2(card)+'Sec');i.value=clamp((+i.value||0)+delta,0,55);}
+  else if(field==='n'){const m={exo:'inExo',tours:'inTours'};const maxN={exo:30,tours:20};const i=document.getElementById(m[card]);i.value=clamp((+i.value||0)+delta,1,maxN[card]);}
   saveCard(card);
 }
 
