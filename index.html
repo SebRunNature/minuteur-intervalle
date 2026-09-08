@@ -199,6 +199,7 @@ body.phase-marche{background:var(--trepos-bg)}
 body.light .tl-done{background:rgba(255,255,255,.55);border-right-color:var(--text)}
 @keyframes attention{0%,100%{border-color:var(--border);transform:none}25%{border-color:var(--green);transform:scale(1.015)}60%{border-color:var(--green)}}
 .gen-card.attention{animation:attention .9s ease 2}
+.total-hero.attention{animation:attention .9s ease 2}
 .page{display:none;flex:1;flex-direction:column;overflow-y:auto;min-height:0}
 .page.active{display:flex}
 @media(max-width:380px){.cfg-value{font-size:1.6rem}.timer-big{font-size:3.6rem}.ring-wrap{width:190px;height:190px}}
@@ -926,6 +927,29 @@ function saveCard(id){
   updateCfgDisplay();
   saveCfg();
 }
+/* ── LIEN DE SÉANCE PARTAGEABLE ──
+   ?effort=60&repos=90&exo=8&tours=2&trepos=90 dans l'URL pré-remplit la
+   config HIIT au chargement. Permet de lier une séance précise depuis un
+   article de blog : le lecteur arrive avec les réglages déjà en place,
+   il n'a plus qu'à cliquer Démarrer. */
+function applySharedLinkParams(){
+  const p = new URLSearchParams(location.search);
+  const keys = ['effort','repos','exo','tours','trepos'];
+  if(!keys.some(k => p.has(k))) return;
+  if(p.has('effort')) cfg.effortSec = clamp(p.get('effort'), 0, 3595);
+  if(p.has('repos'))  cfg.reposSec  = clamp(p.get('repos'), 0, 3595);
+  if(p.has('exo'))    cfg.exo       = clamp(p.get('exo'), 1, 30);
+  if(p.has('tours'))  cfg.tours     = clamp(p.get('tours'), 1, 20);
+  if(p.has('trepos')) cfg.treposSec = clamp(p.get('trepos'), 0, 655);
+  if(!cfg.effortSec) cfg.effortSec = 5;
+  saveCfg();
+  clearPreset();
+  appMode = 'hiit';
+  document.addEventListener('DOMContentLoaded', () => {
+    const hero = document.querySelector('.total-hero');
+    if(hero){ hero.classList.remove('attention'); void hero.offsetWidth; hero.classList.add('attention'); }
+  });
+}
 function spin(card,field,delta,e){
   e.stopPropagation();saveCard(card);
   if(field==='min'){const i=document.getElementById('in'+cap(card)+'Min');i.value=clamp((+i.value||0)+delta,0,card==='trepos'?10:59);}
@@ -1219,6 +1243,7 @@ function syncPersistedUI(){
 }
 document.addEventListener('DOMContentLoaded', syncPersistedUI);
 
+applySharedLinkParams();
 updateCfgDisplay();
 
 /* ── Init Mode Trail : restaurer l'état persisté ── */
