@@ -111,7 +111,7 @@ body.phase-marche{background:var(--trepos-bg)}
 .gen-card{margin:0 18px 14px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px}
 .gen-card-title{font-family:var(--font-display);font-weight:700;font-size:.9rem;color:var(--text);margin-bottom:2px}
 .gen-card-sub{font-size:.76rem;color:var(--muted);margin-bottom:14px}
-.gen-inputs{display:flex;gap:16px;margin-bottom:14px}
+.gen-inputs{display:flex;gap:10px;margin-bottom:14px}
 .gen-input-group{flex:1}
 .gen-input-group label{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);display:block;margin-bottom:6px}
 .gen-input-wrap{display:flex;align-items:center;gap:6px}
@@ -445,7 +445,7 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:') {
 
     <div class="gen-card">
       <div class="gen-card-title">Générateur automatique</div>
-      <div class="gen-card-sub">Indique ta distance et ton D+, la séance se génère toute seule</div>
+      <div class="gen-card-sub">Indique ta distance, ton D+ et la durée voulue, la séance se génère toute seule</div>
       <div class="gen-inputs">
         <div class="gen-input-group">
           <label>Distance</label>
@@ -459,6 +459,13 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:') {
           <div class="gen-input-wrap">
             <input class="gen-input" type="number" id="genDplus" min="0" max="15000" step="50" value="350">
             <span class="gen-unit">m</span>
+          </div>
+        </div>
+        <div class="gen-input-group">
+          <label>Durée</label>
+          <div class="gen-input-wrap">
+            <input class="gen-input" type="number" id="genDuree" min="20" max="240" step="5" value="45">
+            <span class="gen-unit">min</span>
           </div>
         </div>
       </div>
@@ -719,7 +726,10 @@ function detectActivePreset(){
 let appMode = localStorage.getItem('minuteurMode') || 'hiit'; // 'hiit' | 'trail'
 let terrainProfile = localStorage.getItem('terrainProfile') || 'tapis'; // 'tapis' | 'vallonne' | 'plat'
 
-const TRAIL_DEFAULT = { monteeSec:180, platSec:120, descenteSec:120, marcheSec:60, tours:4, dist:10, dplus:350, inclineMontee:7, isSeche:false };
+const TRAIL_DEFAULT = { monteeSec:180, platSec:120, descenteSec:120, marcheSec:60, tours:4, dist:10, dplus:350, duree:45, inclineMontee:7, inclineDescente:1, isSeche:false };
+// Inclinaisons tapis : 2 % pour simuler la route (plat, marche récup, échauffement, retour au calme)
+const TRAIL_INCLINE_PLAT = 2;
+const TRAIL_WARM_SEC = 300; // échauffement et retour au calme, 5 min chacun
 const TRAIL_STEPS_PER_TOUR = 4; // montée, plat, descente, marche
 function loadTrail(){
   try {
@@ -740,9 +750,11 @@ const TERRAIN_MSG = {
     montee:   () => trail.isSeche
       ? `Montée sèche. Marche rapide, inclinaison à ${trail.inclineMontee} pour cent.`
       : `Montée. Passe l'inclinaison à ${trail.inclineMontee} pour cent.`,
-    plat:     () => `Plat. Inclinaison à zéro.`,
-    descente: () => `Descente. Redescends l'inclinaison à un pour cent.`,
-    marche:   () => `Marche récupération.`
+    plat:     () => `Plat. Inclinaison à ${TRAIL_INCLINE_PLAT} pour cent.`,
+    descente: () => trail.inclineDescente === 0
+      ? `Grande descente. Inclinaison à zéro pour cent.`
+      : `Descente. Redescends l'inclinaison à ${trail.inclineDescente} pour cent.`,
+    marche:   () => `Marche récupération. Inclinaison à ${TRAIL_INCLINE_PLAT} pour cent.`
   },
   vallonne: {
     montee:   () => trail.isSeche
@@ -792,6 +804,7 @@ function setTerrainProfile(p){
 function generateTrailSequence(){
   const dist  = Math.max(1, +document.getElementById('genDist').value || 10);
   const dplus = Math.max(0, +document.getElementById('genDplus').value || 0);
+  const duree = clamp(document.getElementById('genDuree').value || 45, 20, 240); // minutes
   const ratio = dplus / dist; // m/km — intensité du dénivelé
 
   // Paliers d'intensité : au-delà d'un certain ratio, une montée réelle devient
@@ -807,18 +820,20 @@ function generateTrailSequence(){
   const descenteMin = Math.max(1, Math.round(monteeMin*0.7));
   const platMin      = 2;
   const marcheMin    = 1;
-  // Montée sèche : segments courts mais répétés plus souvent pour garder le volume
-  const tours = isSeche
-    ? Math.min(10, Math.max(4, Math.round(dist/1.5)))
-    : Math.min(8, Math.max(3, Math.round(dist/2.5)));
+  // Grande descente (0 %) sur profil raide, petite descente (1 %) sinon
+  const inclineDescente = ratio >= 100 ? 0 : 1;
+  // Nombre de tours déduit de la durée cible : (durée − échauffement − retour au calme) / durée d'un tour
+  const tourMin = monteeMin + descenteMin + platMin + marcheMin;
+  const tours = Math.max(1, Math.round((duree - 2*TRAIL_WARM_SEC/60) / tourMin));
 
-  trail.dist=dist; trail.dplus=dplus;
+  trail.dist=dist; trail.dplus=dplus; trail.duree=duree;
   trail.monteeSec = monteeMin*60;
   trail.descenteSec = descenteMin*60;
   trail.platSec = platMin*60;
   trail.marcheSec = marcheMin*60;
   trail.tours = tours;
   trail.inclineMontee = inclineMontee;
+  trail.inclineDescente = inclineDescente;
   trail.isSeche = isSeche;
   saveTrail();
   hasTrailSeq = true;
@@ -844,11 +859,13 @@ function renderTrailPreview(){
     : '';
   const segs = [
     {type:'montee',   name: trail.isSeche ? 'Montée sèche' : 'Montée', sec:trail.monteeSec, incline: isTapis ? `${trail.inclineMontee}%` : null},
-    {type:'plat',     name:'Plat',         sec:trail.platSec,     incline: isTapis ? '0%' : null},
-    {type:'descente', name:'Descente',     sec:trail.descenteSec, incline: isTapis ? '1%' : null},
-    {type:'marche',   name:'Marche récup', sec:trail.marcheSec,   incline: null},
+    {type:'plat',     name:'Plat',         sec:trail.platSec,     incline: isTapis ? `${TRAIL_INCLINE_PLAT}%` : null},
+    {type:'descente', name: trail.inclineDescente === 0 ? 'Grande descente' : 'Descente', sec:trail.descenteSec, incline: isTapis ? `${trail.inclineDescente}%` : null},
+    {type:'marche',   name:'Marche récup', sec:trail.marcheSec,   incline: isTapis ? `${TRAIL_INCLINE_PLAT}%` : null},
   ];
-  list.innerHTML = secheNote + segs.map(s => `
+  const perTour = trail.monteeSec + trail.platSec + trail.descenteSec + trail.marcheSec;
+  const detail = `<div class="trail-note">5 min échauffement + ${trail.tours} × ${fmt(perTour)} + 5 min retour au calme = ${fmt(trailTotalSec())}${isTapis ? ` · plat, marche, échauffement et retour au calme à ${TRAIL_INCLINE_PLAT}%` : ''}</div>`;
+  list.innerHTML = secheNote + detail + segs.map(s => `
     <div class="seg-row">
       <div class="seg-dot ${s.type}"></div>
       <div class="seg-name">${s.name}</div>
@@ -861,7 +878,7 @@ function renderTrailPreview(){
 
 function trailTotalSec(){
   const perTour = trail.monteeSec + trail.platSec + trail.descenteSec + trail.marcheSec;
-  return 300 + perTour*trail.tours + 300; // + échauffement 5min + retour calme 5min
+  return TRAIL_WARM_SEC + perTour*trail.tours + TRAIL_WARM_SEC; // + échauffement et retour au calme
 }
 
 function hiitTotalSec(){
@@ -1009,14 +1026,14 @@ function buildState(){
 
   let seq=[];
   if(appMode === 'trail'){
-    seq.push({phase:'plat', sec:300, tour:0, exo:0, label:'Échauffement'});
+    seq.push({phase:'plat', sec:TRAIL_WARM_SEC, tour:0, exo:0, label:'Échauffement'});
     for(let t=1;t<=trail.tours;t++){
       seq.push({phase:'montee',   sec:trail.monteeSec,   tour:t, exo:1});
       seq.push({phase:'plat',     sec:trail.platSec,     tour:t, exo:2});
       seq.push({phase:'descente', sec:trail.descenteSec, tour:t, exo:3});
       seq.push({phase:'marche',   sec:trail.marcheSec,   tour:t, exo:4});
     }
-    seq.push({phase:'plat', sec:300, tour:trail.tours+1, exo:0, label:'Retour au calme'});
+    seq.push({phase:'plat', sec:TRAIL_WARM_SEC, tour:trail.tours+1, exo:0, label:'Retour au calme'});
   } else {
     for(let t=1;t<=cfg.tours;t++){
       for(let e=1;e<=cfg.exo;e++){
@@ -1129,10 +1146,11 @@ function renderTimer(){
 
   if(appMode==='trail'){
     let sub='';
+    const tapisIncl = {montee:trail.inclineMontee, plat:TRAIL_INCLINE_PLAT, descente:trail.inclineDescente, marche:TRAIL_INCLINE_PLAT}[ph];
     if(s.label){
-      sub=s.label;
-    } else if(terrainProfile==='tapis' && (ph==='montee'||ph==='descente')){
-      sub=`Inclinaison ${ph==='montee' ? trail.inclineMontee : 1}%`;
+      sub = terrainProfile==='tapis' ? `${s.label} · ${tapisIncl}%` : s.label;
+    } else if(terrainProfile==='tapis'){
+      sub=`Inclinaison ${tapisIncl}%`;
     } else {
       sub={montee:'Effort soutenu',plat:'Allure normale',descente:'Récupération active',marche:'Marche'}[ph]||'';
     }
@@ -1265,6 +1283,7 @@ updateCfgDisplay();
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('genDist').value = trail.dist;
   document.getElementById('genDplus').value = trail.dplus;
+  document.getElementById('genDuree').value = trail.duree;
   switchMode(appMode);
   setTerrainProfile(terrainProfile); // met aussi à jour l'aperçu si une séquence existe déjà
 });
