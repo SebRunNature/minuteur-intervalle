@@ -464,7 +464,7 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:') {
         <div class="gen-input-group">
           <label>Durée</label>
           <div class="gen-input-wrap">
-            <input class="gen-input" type="number" id="genDuree" min="20" max="240" step="5" value="45">
+            <input class="gen-input" type="number" id="genDuree" min="20" max="240" step="5" placeholder="auto">
             <span class="gen-unit">min</span>
           </div>
         </div>
@@ -726,7 +726,7 @@ function detectActivePreset(){
 let appMode = localStorage.getItem('minuteurMode') || 'hiit'; // 'hiit' | 'trail'
 let terrainProfile = localStorage.getItem('terrainProfile') || 'tapis'; // 'tapis' | 'vallonne' | 'plat'
 
-const TRAIL_DEFAULT = { monteeSec:180, platSec:120, descenteSec:120, marcheSec:60, tours:4, dist:10, dplus:350, duree:45, inclineMontee:7, inclineDescente:1, isSeche:false };
+const TRAIL_DEFAULT = { monteeSec:180, platSec:120, descenteSec:120, marcheSec:60, tours:4, dist:10, dplus:350, duree:'', inclineMontee:7, inclineDescente:1, isSeche:false };
 // Inclinaisons tapis : 2 % pour simuler la route (plat, marche récup, échauffement, retour au calme)
 const TRAIL_INCLINE_PLAT = 2;
 const TRAIL_WARM_SEC = 300; // échauffement et retour au calme, 5 min chacun
@@ -804,7 +804,7 @@ function setTerrainProfile(p){
 function generateTrailSequence(){
   const dist  = Math.max(1, +document.getElementById('genDist').value || 10);
   const dplus = Math.max(0, +document.getElementById('genDplus').value || 0);
-  const duree = clamp(document.getElementById('genDuree').value || 45, 20, 240); // minutes
+  const dureeInput = document.getElementById('genDuree').value.trim(); // vide = automatique
   const ratio = dplus / dist; // m/km — intensité du dénivelé
 
   // Paliers d'intensité : au-delà d'un certain ratio, une montée réelle devient
@@ -824,9 +824,19 @@ function generateTrailSequence(){
   const inclineDescente = ratio >= 100 ? 0 : 1;
   // Nombre de tours déduit de la durée cible : (durée − échauffement − retour au calme) / durée d'un tour
   const tourMin = monteeMin + descenteMin + platMin + marcheMin;
-  const tours = Math.max(1, Math.round((duree - 2*TRAIL_WARM_SEC/60) / tourMin));
+  const warmMin = 2*TRAIL_WARM_SEC/60;
+  let tours;
+  if(dureeInput === ''){
+    // Durée non renseignée : on la déduit de la distance pour rester cohérent
+    // (30 km ne peut pas donner une séance de 45 min).
+    tours = isSeche
+      ? Math.min(10, Math.max(4, Math.round(dist/1.5)))
+      : Math.min(8, Math.max(3, Math.round(dist/2.5)));
+  } else {
+    tours = Math.max(1, Math.round((clamp(dureeInput, 20, 240) - warmMin) / tourMin));
+  }
 
-  trail.dist=dist; trail.dplus=dplus; trail.duree=duree;
+  trail.dist=dist; trail.dplus=dplus; trail.duree=dureeInput; // '' = automatique, le champ reste vide pour suivre la distance
   trail.monteeSec = monteeMin*60;
   trail.descenteSec = descenteMin*60;
   trail.platSec = platMin*60;
