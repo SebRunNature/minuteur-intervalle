@@ -218,6 +218,29 @@ body.light .tl-done{background:rgba(255,255,255,.55);border-right-color:var(--te
 @keyframes attention{0%,100%{border-color:var(--border);transform:none}25%{border-color:var(--green);transform:scale(1.015)}60%{border-color:var(--green)}}
 .gen-card.attention{animation:attention .9s ease 2}
 .total-hero.attention{animation:attention .9s ease 2}
+.voice-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:50;display:none;align-items:flex-end;justify-content:center}
+.voice-overlay.open{display:flex}
+.voice-sheet{width:100%;max-width:480px;background:var(--card);border-radius:22px 22px 0 0;padding:10px 16px 18px;border-top:1px solid var(--border);max-height:92vh;overflow-y:auto}
+.vs-grip{width:38px;height:4px;border-radius:2px;background:var(--border);margin:0 auto 10px}
+.vs-title{display:flex;justify-content:space-between;align-items:center;font-family:var(--font-display);font-weight:700;font-size:1rem;margin-bottom:6px}
+.vs-title button{background:none;border:none;color:var(--muted);font-size:1.2rem;cursor:pointer;padding:4px 8px}
+.vs-lbl{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:12px 0 6px}
+.vs-chips{display:flex;gap:6px}
+.vs-chip{flex:1;text-align:center;padding:9px 4px;border-radius:10px;background:var(--card2);border:1px solid var(--border);font-size:.78rem;font-weight:700;color:var(--muted);cursor:pointer;font-family:var(--font-main)}
+.vs-chip.act{border-color:var(--green);color:var(--green-bright);background:rgba(29,158,117,.14)}
+.vs-chip b{display:block;font-size:1.1rem;margin-bottom:1px;font-weight:400}
+.vs-voices{display:flex;flex-direction:column;gap:6px;max-height:150px;overflow-y:auto}
+.vs-voice{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:10px;background:var(--card2);border:1px solid var(--border);font-size:.82rem;cursor:pointer;color:var(--text);text-align:left;font-family:var(--font-main)}
+.vs-voice.act{border-color:var(--green);background:rgba(29,158,117,.14)}
+.vs-dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--muted);flex:none}
+.vs-voice.act .vs-dot{border-color:var(--green-bright);background:radial-gradient(var(--green-bright) 45%,transparent 50%)}
+.vs-voice small{margin-left:auto;color:var(--muted);font-size:.68rem}
+.vs-sl{display:flex;align-items:center;gap:10px;font-size:.78rem;margin:6px 0}
+.vs-sl span:first-child{width:62px;color:var(--muted);font-weight:700}
+.vs-sl span:last-child{width:38px;text-align:right;font-weight:700}
+.vs-sl input{flex:1;accent-color:var(--green)}
+.vs-test{width:100%;margin-top:12px;padding:13px;border:none;border-radius:12px;background:linear-gradient(135deg,var(--green-dk),var(--green));color:#fff;font-family:var(--font-display);font-weight:700;font-size:.95rem;cursor:pointer}
+.vs-note{font-size:.7rem;color:var(--muted);margin-top:8px;line-height:1.4}
 .page{display:none;flex:1;flex-direction:column;overflow-y:auto;min-height:0}
 .page.active{display:flex}
 @media(max-width:380px){.cfg-value{font-size:1.6rem}.timer-big{font-size:3.6rem}.ring-wrap{width:190px;height:190px}}
@@ -315,8 +338,31 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:') {
     </div>
   </div>
   <div class="header-controls">
+    <button class="header-btn" id="btnVoice" onclick="openVoiceSettings()" title="Voix du guidage" aria-label="Voix du guidage"><svg class="ic"><use href="#i-mic"/></svg></button>
     <button class="header-btn" id="btnTheme" onclick="toggleTheme()" title="Mode jour/nuit"><svg class="ic"><use href="#i-moon"/></svg></button>
     <button class="header-btn" id="btnFs" onclick="toggleFullscreen()" title="Plein écran"><svg class="ic" id="fsIcon"><use href="#i-expand"/></svg></button>
+  </div>
+</div>
+
+<!-- RÉGLAGES VOIX -->
+<div class="voice-overlay" id="voiceOverlay" onclick="if(event.target===this)closeVoiceSettings()">
+  <div class="voice-sheet" role="dialog" aria-label="Voix du guidage">
+    <div class="vs-grip"></div>
+    <div class="vs-title">Voix du guidage <button onclick="closeVoiceSettings()" aria-label="Fermer">✕</button></div>
+    <div class="vs-lbl">Style</div>
+    <div class="vs-chips" id="vsPresets">
+      <button class="vs-chip" data-p="normal"><b>🙂</b>Normale</button>
+      <button class="vs-chip" data-p="grave"><b>🧔</b>Grave</button>
+      <button class="vs-chip" data-p="robot"><b>🤖</b>Robot</button>
+      <button class="vs-chip" data-p="coach"><b>📣</b>Coach</button>
+    </div>
+    <div class="vs-lbl">Voix de l'appareil</div>
+    <div class="vs-voices" id="vsVoices"></div>
+    <div class="vs-lbl">Réglages fins</div>
+    <div class="vs-sl"><span>Hauteur</span><input type="range" id="vsPitch" min="0" max="2" step="0.05"><span id="vsPitchVal"></span></div>
+    <div class="vs-sl"><span>Vitesse</span><input type="range" id="vsRate" min="0.6" max="1.6" step="0.05"><span id="vsRateVal"></span></div>
+    <button class="vs-test" onclick="testVoice()"><svg class="ic"><use href="#i-play"/></svg> Tester la voix</button>
+    <div class="vs-note">Les voix proposées dépendent de ton appareil. Certains téléphones ignorent le réglage de hauteur.</div>
   </div>
 </div>
 
@@ -631,20 +677,63 @@ function toggleAudio(){
   localStorage.setItem('minuteurVoice', turningOn ? 'on' : 'off');
 }
 
+/* ── Réglages de la voix : style, voix de l'appareil, hauteur, vitesse ── */
+const VOICE_PRESETS = {normal:[1,1.05], grave:[.6,1], robot:[0,.85], coach:[1.1,1.2]};
+function loadVoiceCfg(){
+  const d = {voiceURI:'', pitch:1, rate:1.05};
+  try { const v = JSON.parse(localStorage.getItem('minuteurVoiceCfg')); if(v && typeof v==='object') return {...d, ...v}; } catch(e){}
+  return d;
+}
+const voiceCfg = loadVoiceCfg();
+function saveVoiceCfg(){ try { localStorage.setItem('minuteurVoiceCfg', JSON.stringify(voiceCfg)); } catch(e){} }
+const frVoices = () => speechSynth ? speechSynth.getVoices().filter(v => v.lang.toLowerCase().startsWith('fr')) : [];
+function makeUtterance(text){
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = voiceLang;
+  u.rate = voiceCfg.rate;
+  u.pitch = voiceCfg.pitch;
+  u.volume = 1.0;
+  // Voix choisie si encore disponible, sinon première voix française
+  const fr = frVoices();
+  const voice = fr.find(v => (v.voiceURI || v.name) === voiceCfg.voiceURI) || fr[0];
+  if(voice) u.voice = voice;
+  return u;
+}
 function speak(text, priority=false){
   if(!voiceOn || !speechSynth || typeof SpeechSynthesisUtterance === 'undefined') return;
   if(priority) if(speechSynth) speechSynth.cancel();
-  const u = new SpeechSynthesisUtterance(text);
-  u.lang = voiceLang;
-  u.rate = 1.05;
-  u.pitch = 1.0;
-  u.volume = 1.0;
-  // Choisir une voix française si dispo
-  const voices = speechSynth.getVoices();
-  const frVoice = voices.find(v => v.lang.startsWith('fr'));
-  if(frVoice) u.voice = frVoice;
-  speechSynth.speak(u);
+  speechSynth.speak(makeUtterance(text));
 }
+function renderVoiceSettings(){
+  const box = document.getElementById('vsVoices');
+  const fr = frVoices();
+  const current = fr.find(v => (v.voiceURI || v.name) === voiceCfg.voiceURI) || fr[0];
+  box.innerHTML = fr.length
+    ? fr.map(v => { const id = v.voiceURI || v.name; return `<button class="vs-voice${v===current?' act':''}" data-id="${id.replace(/"/g,'&quot;')}"><span class="vs-dot"></span>${v.name}<small>${v.lang}</small></button>`; }).join('')
+    : '<div class="vs-voice"><span class="vs-dot"></span>Aucune voix française détectée<small>—</small></div>';
+  box.querySelectorAll('.vs-voice[data-id]').forEach(b => b.onclick = () => { voiceCfg.voiceURI = b.dataset.id; saveVoiceCfg(); renderVoiceSettings(); });
+  document.getElementById('vsPitch').value = voiceCfg.pitch;
+  document.getElementById('vsRate').value = voiceCfg.rate;
+  document.getElementById('vsPitchVal').textContent = (+voiceCfg.pitch).toFixed(2).replace('.',',');
+  document.getElementById('vsRateVal').textContent = (+voiceCfg.rate).toFixed(2).replace('.',',');
+  const active = Object.keys(VOICE_PRESETS).find(k => VOICE_PRESETS[k][0]===+voiceCfg.pitch && VOICE_PRESETS[k][1]===+voiceCfg.rate);
+  document.querySelectorAll('#vsPresets .vs-chip').forEach(c => c.classList.toggle('act', c.dataset.p===active));
+}
+function openVoiceSettings(){ renderVoiceSettings(); document.getElementById('voiceOverlay').classList.add('open'); }
+function closeVoiceSettings(){ document.getElementById('voiceOverlay').classList.remove('open'); if(speechSynth) speechSynth.cancel(); }
+function testVoice(){
+  if(!speechSynth || typeof SpeechSynthesisUtterance === 'undefined') return;
+  speechSynth.cancel();
+  speechSynth.speak(makeUtterance(appMode==='trail' ? `Montée. Passe l'inclinaison à ${trail.inclineMontee} pour cent.` : `Effort ! Exercice 1 sur ${cfg.exo}`));
+}
+document.querySelectorAll('#vsPresets .vs-chip').forEach(c => c.onclick = () => {
+  [voiceCfg.pitch, voiceCfg.rate] = VOICE_PRESETS[c.dataset.p]; saveVoiceCfg(); renderVoiceSettings();
+});
+['vsPitch','vsRate'].forEach(id => document.getElementById(id).oninput = () => {
+  voiceCfg.pitch = +document.getElementById('vsPitch').value;
+  voiceCfg.rate = +document.getElementById('vsRate').value;
+  saveVoiceCfg(); renderVoiceSettings();
+});
 
 function announcePhase(ph, s){
   if(appMode === 'trail'){
@@ -688,7 +777,7 @@ function announceFinish(){
 
 // Charger les voix dès que disponibles (nécessaire sur Chrome)
 if(speechSynth && speechSynth.onvoiceschanged !== undefined){
-  speechSynth.onvoiceschanged = () => { speechSynth.getVoices(); };
+  speechSynth.onvoiceschanged = () => { speechSynth.getVoices(); if(document.getElementById('voiceOverlay').classList.contains('open')) renderVoiceSettings(); };
 }
 
 const PRESETS = {
