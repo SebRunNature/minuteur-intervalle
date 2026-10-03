@@ -146,7 +146,8 @@ body.phase-marche{background:var(--trepos-bg)}
 .btn-start{width:100%;padding:16px;background:linear-gradient(135deg,var(--green-dk),var(--green));border:none;border-radius:14px;cursor:pointer;font-family:var(--font-display);font-weight:700;font-size:1.15rem;letter-spacing:.06em;text-transform:uppercase;color:#fff;transition:all .2s;box-shadow:0 4px 20px rgba(29,158,117,.3)}
 .btn-start:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(29,158,117,.4)}
 .timer-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:12px 18px 14px}
-.phase-label{font-family:var(--font-display);font-weight:700;font-size:.95rem;letter-spacing:.08em;text-transform:uppercase;padding:7px 22px;border-radius:30px;transition:all .4s}
+.phase-label{font-family:var(--font-display);font-weight:700;font-size:.95rem;letter-spacing:.08em;text-transform:uppercase;padding:7px 22px;border-radius:30px;transition:all .4s;display:inline-flex;align-items:center;gap:8px}
+.phase-label .ic{width:1.35em;height:1.35em;stroke-width:3}
 .phase-label.effort{background:rgba(29,158,117,.2);color:var(--green-bright);border:1px solid rgba(29,158,117,.4)}
 .phase-label.repos{background:rgba(58,123,213,.2);color:#a8c8f8;border:1px solid rgba(58,123,213,.4)}
 .phase-label.trepos{background:rgba(120,80,200,.2);color:#c8b0f8;border:1px solid rgba(120,80,200,.4)}
@@ -163,6 +164,23 @@ body.phase-marche{background:var(--trepos-bg)}
 .timer-display{text-align:center;z-index:1}
 .timer-big{font-family:var(--font-display);font-weight:700;font-size:4rem;letter-spacing:-2px;line-height:1;color:var(--text)}
 .timer-sub{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-top:3px}
+.incl-badge{display:none;align-items:center;gap:4px;margin-top:6px;padding:4px 12px;border-radius:12px;background:rgba(127,127,127,.18);font-family:var(--font-display);font-weight:800;font-size:1.7rem;line-height:1}
+.incl-badge.show{display:inline-flex}
+.incl-badge .ic{width:1em;height:1em;stroke-width:3}
+.incl-badge small{font-size:.9rem;font-weight:700}
+.incl-badge.montee{color:var(--green-bright)}.incl-badge.plat{color:var(--muted)}.incl-badge.descente{color:#a8c8f8}.incl-badge.marche{color:#f5c563}
+.next-box{display:none;width:100%;max-width:360px;align-items:center;gap:10px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:9px 12px;font-size:.78rem;color:var(--muted);font-weight:600}
+.next-box.show{display:flex}
+.next-box>span:first-child{font-size:1.5rem;line-height:1;display:flex}
+.next-box .ic{width:1em;height:1em;stroke-width:3}
+.next-box b{display:block;font-family:var(--font-display);font-size:.95rem;color:var(--text)}
+.next-box .next-dur{margin-left:auto;font-family:var(--font-display);font-weight:800;font-size:.95rem;color:var(--text)}
+.next-box .montee{color:var(--green-bright)}.next-box .plat{color:var(--muted)}.next-box .descente{color:#a8c8f8}.next-box .marche{color:#f5c563}
+.session-profile{display:none;width:100%;max-width:360px}
+.session-profile svg{width:100%;height:auto;display:block}
+.pf-dim{opacity:.28}
+.pf-cursor{stroke:var(--text);stroke-width:1.5;stroke-dasharray:3 3;opacity:.6}
+.pf-dot{fill:var(--text);stroke:var(--card);stroke-width:3}
 .timer-total-pill{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:5px 16px;font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);display:inline-flex;align-items:center;gap:6px}
 .timer-total-pill span{font-family:var(--font-display);font-weight:700;font-size:1.05rem;color:var(--green-bright);letter-spacing:-.3px}
 .progress-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;width:100%}
@@ -262,6 +280,10 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:') {
 <g id="i-sun"><circle cx="12" cy="12" r="4"/><path d="M3 12h1M20 12h1M12 3v1M12 20v1M5.6 5.6l.7 .7M18.4 18.4l-.7 -.7M5.6 18.4l.7 -.7M18.4 5.6l-.7 .7"/></g>
 <g id="i-expand"><path d="M4 8V5a1 1 0 0 1 1 -1h3M4 16v3a1 1 0 0 0 1 1h3M16 4h3a1 1 0 0 1 1 1v3M16 20h3a1 1 0 0 0 1 -1v-3"/></g>
 <g id="i-collapse"><path d="M15 19v-2a2 2 0 0 1 2 -2h2M15 5v2a2 2 0 0 0 2 2h2M5 15h2a2 2 0 0 1 2 2v2M5 9h2a2 2 0 0 0 2 -2v-2"/></g>
+<g id="i-arrow-up"><path d="M4 18L20 6"/><path d="M11 6h9v9"/></g>
+<g id="i-arrow-flat"><path d="M4 12h16"/><path d="M14 6l6 6-6 6"/></g>
+<g id="i-arrow-down"><path d="M4 6L20 18"/><path d="M11 18h9v-9"/></g>
+<g id="i-walk"><circle cx="13" cy="4.5" r="2"/><path d="M12 8l-2 5 3 2 1 5M12 8l4 3 2-1M10 13l-3 4"/></g>
 <g id="i-mic"><path d="M9 4a3 3 0 0 1 6 0v6a3 3 0 0 1 -6 0z"/><path d="M5 10a7 7 0 0 0 14 0"/><path d="M8 21l8 0"/><path d="M12 17l0 4"/></g>
 <g id="i-mic-off"><path d="M9 5a3 3 0 0 1 6 0v4m0 4v.5a3 3 0 0 1 -5.5 1.5"/><path d="M5 10a7 7 0 0 0 10.34 6.14"/><path d="M17.4 15.4a7 7 0 0 0 1.6 -5.4"/><path d="M8 21l8 0"/><path d="M12 17l0 4"/><path d="M3 3l18 18"/></g>
 <g id="i-volume"><path d="M15 8a5 5 0 0 1 0 8"/><path d="M17.7 5a9 9 0 0 1 0 14"/><path d="M6 15h-2a1 1 0 0 1 -1 -1v-4a1 1 0 0 1 1 -1h2l3.5 -4.5a.8 .8 0 0 1 1.5 .5v14a.8 .8 0 0 1 -1.5 .5l-3.5 -4.5"/></g>
@@ -508,8 +530,11 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:') {
       <div class="timer-display">
         <div class="timer-big" id="timerBig">00:20</div>
         <div class="timer-sub" id="timerSub">Exercice 1 / 8</div>
+        <div class="incl-badge" id="inclBadge"></div>
       </div>
     </div>
+
+    <div class="next-box" id="nextBox"></div>
 
     <div class="progress-row">
       <div class="prog-chip"><div class="prog-chip-val" id="chipExo">1/8</div><div class="prog-chip-lbl">Exercice</div></div>
@@ -521,6 +546,8 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:') {
       <div class="tl-segs" id="tlSegs"></div>
       <div class="tl-done" id="tlDone"></div>
     </div>
+    <!-- Mini profil de séance (mode trail) -->
+    <div class="session-profile" id="sessionProfile" aria-hidden="true"></div>
 
     <div class="controls">
       <button class="btn-ctrl" onclick="resetTimer()"><svg class="ic"><use href="#i-back"/></svg> Reset</button>
@@ -1127,8 +1154,63 @@ function tick(){
     renderTimer();
   }
 }
+/* ── Trail : libellés, icônes, inclinaisons ── */
+const TRAIL_ICON = {montee:'i-arrow-up', plat:'i-arrow-flat', descente:'i-arrow-down', marche:'i-walk'};
+const iconSvg = id => `<svg class="ic"><use href="#${id}"/></svg>`;
+function trailName(seg){
+  if(seg.label) return seg.label;
+  if(seg.phase==='montee') return trail.isSeche ? 'Montée sèche' : 'Montée';
+  if(seg.phase==='descente') return trail.inclineDescente===0 ? 'Grande descente' : 'Descente';
+  return {plat:'Plat', marche:'Marche récup'}[seg.phase];
+}
+function trailIncl(ph){
+  return {montee:trail.inclineMontee, plat:TRAIL_INCLINE_PLAT, descente:trail.inclineDescente, marche:TRAIL_INCLINE_PLAT}[ph];
+}
+
+/* ── Mini profil de séance : courbe stylisée (la montée grimpe, la descente redescend) ── */
+const PF_W=312, PF_H=84, PF_PAD=10;
+const PF_COL = {montee:'#1d9e75', plat:'#7d756a', descente:'#3a7bd5', marche:'#e8a020'};
+function buildProfile(){
+  const box=document.getElementById('sessionProfile');
+  let x=0, alt=0;
+  const pts=state.seq.map(s=>{
+    const w=s.sec/state.grandTotal*PF_W;
+    const d={montee:3, descente:-1.6}[s.phase]*s.sec/60 || 0;
+    const p={x0:x, x1:x+w, a0:alt, a1:alt+d, ph:s.phase};
+    x+=w; alt+=d; return p;
+  });
+  const lo=Math.min(...pts.map(p=>Math.min(p.a0,p.a1))), hi=Math.max(...pts.map(p=>Math.max(p.a0,p.a1)));
+  const Y=a=>PF_PAD+(PF_H-2*PF_PAD)*(1-(a-lo)/((hi-lo)||1));
+  pts.forEach(p=>{p.y0=Y(p.a0); p.y1=Y(p.a1);});
+  state.profile=pts;
+  const lines=c=>pts.map(p=>`<line x1="${p.x0.toFixed(1)}" y1="${p.y0.toFixed(1)}" x2="${p.x1.toFixed(1)}" y2="${p.y1.toFixed(1)}" stroke="${PF_COL[p.ph]||PF_COL.plat}" stroke-width="4" stroke-linecap="round"${c?'':' class="pf-dim"'}/>`).join('');
+  box.innerHTML=`<svg viewBox="0 0 ${PF_W} ${PF_H}">
+    ${lines(false)}
+    <clipPath id="pfClip"><rect id="pfClipRect" x="0" y="0" width="0" height="${PF_H}"/></clipPath>
+    <g clip-path="url(#pfClip)">${lines(true)}</g>
+    <line id="pfCursor" class="pf-cursor" x1="0" x2="0" y1="${PF_PAD-4}" y2="${PF_H-4}"/>
+    <circle id="pfDot" class="pf-dot" r="6" cx="0" cy="${Y(0)}"/>
+  </svg>`;
+}
+function updateProfile(elapsed){
+  const pts=state.profile; if(!pts) return;
+  const cx=Math.min(PF_W, elapsed/state.grandTotal*PF_W);
+  const seg=pts.find(p=>cx<p.x1) || pts[pts.length-1];
+  const f=seg.x1>seg.x0 ? Math.min(1,Math.max(0,(cx-seg.x0)/(seg.x1-seg.x0))) : 1;
+  const cy=seg.y0+(seg.y1-seg.y0)*f;
+  document.getElementById('pfClipRect').setAttribute('width',cx.toFixed(1));
+  const cur=document.getElementById('pfCursor');
+  cur.setAttribute('x1',cx.toFixed(1)); cur.setAttribute('x2',cx.toFixed(1));
+  const dot=document.getElementById('pfDot');
+  dot.setAttribute('cx',cx.toFixed(1)); dot.setAttribute('cy',cy.toFixed(1));
+}
+
 function buildTimeline(){
   if(!state)return;
+  const trailMode = appMode==='trail';
+  document.getElementById('sessionTimeline').style.display = trailMode ? 'none' : '';
+  document.getElementById('sessionProfile').style.display = trailMode ? 'block' : 'none';
+  if(trailMode) buildProfile();
   document.getElementById('tlSegs').innerHTML = state.seq.map(s =>
     `<div class="tl-seg ${s.phase}" style="width:${(s.sec/state.grandTotal*100).toFixed(3)}%"></div>`
   ).join('');
@@ -1140,12 +1222,18 @@ function renderTimer(){
   // Progression globale sur la timeline
   const elapsed = state.grandTotal - state.totalSec;
   document.getElementById('tlDone').style.width = (elapsed/state.grandTotal*100).toFixed(2)+'%';
+  if(appMode==='trail') updateProfile(elapsed);
   removeAllPhaseClasses();
   document.body.classList.add('phase-'+ph);
   const lbl=document.getElementById('phaseLabel');
   const PHASE_LABELS={effort:'Effort',repos:'Repos',trepos:'Tour de repos',montee:'Montée',plat:'Plat',descente:'Descente',marche:'Marche récup'};
   const monteeLabel = (ph==='montee' && appMode==='trail' && trail.isSeche) ? 'Montée sèche' : PHASE_LABELS[ph];
-  lbl.textContent=s.label || monteeLabel || ph;
+  const labelText = s.label || monteeLabel || ph;
+  if(appMode==='trail'){
+    lbl.innerHTML = iconSvg(TRAIL_ICON[ph]) + `<span>${trailName(s)}</span>`;
+  } else {
+    lbl.textContent = labelText;
+  }
   lbl.className='phase-label '+ph;
   const ring=document.getElementById('ringFill');
   ring.className='ring-fill '+ph;
@@ -1154,20 +1242,34 @@ function renderTimer(){
   ring.style.strokeDashoffset=C*(1-state.secLeft/Math.max(1,s.sec));
   document.getElementById('timerBig').textContent=fmt(state.secLeft);
 
+  const badge=document.getElementById('inclBadge'), nextBox=document.getElementById('nextBox');
   if(appMode==='trail'){
+    const tapis = terrainProfile==='tapis';
     let sub='';
-    const tapisIncl = {montee:trail.inclineMontee, plat:TRAIL_INCLINE_PLAT, descente:trail.inclineDescente, marche:TRAIL_INCLINE_PLAT}[ph];
     if(s.label){
-      sub = terrainProfile==='tapis' ? `${s.label} · ${tapisIncl}%` : s.label;
-    } else if(terrainProfile==='tapis'){
-      sub=`Inclinaison ${tapisIncl}%`;
-    } else {
+      sub=s.label;
+    } else if(!tapis){
       sub={montee:'Effort soutenu',plat:'Allure normale',descente:'Récupération active',marche:'Marche'}[ph]||'';
     }
     document.getElementById('timerSub').textContent=sub;
+    // Gros pourcentage d'inclinaison (tapis uniquement), avec la flèche de la phase
+    badge.className='incl-badge '+ph+(tapis?' show':'');
+    badge.innerHTML = tapis ? `${iconSvg(TRAIL_ICON[ph])}${trailIncl(ph)}<small>%</small>` : '';
+    // Aperçu de la phase suivante
+    const nx=state.seq[state.idx+1];
+    if(nx){
+      const nIncl = tapis ? ` ${trailIncl(nx.phase)} %` : '';
+      const nTour = (nx.tour && nx.tour!==s.tour && nx.tour<=trail.tours) ? ` · tour ${nx.tour}` : '';
+      nextBox.innerHTML = `<span class="${nx.phase}">${iconSvg(TRAIL_ICON[nx.phase])}</span><span>Ensuite${nTour}<b>${trailName(nx)}${nIncl}</b></span><span class="next-dur">${fmt(nx.sec)}</span>`;
+    } else {
+      nextBox.innerHTML = `<span>Dernière phase<b>Bravo, c'est bientôt fini !</b></span>`;
+    }
+    nextBox.classList.add('show');
     document.getElementById('chipExo').textContent = s.exo ? `${s.exo}/${TRAIL_STEPS_PER_TOUR}` : '—';
     document.getElementById('chipTour').textContent = s.tour ? `${s.tour}/${trail.tours}` : '—';
   } else {
+    badge.className='incl-badge'; badge.innerHTML='';
+    nextBox.classList.remove('show'); nextBox.innerHTML='';
     document.getElementById('timerSub').textContent=ph==='effort'?`Exercice ${s.exo} / ${cfg.exo}`:ph==='repos'?'Récupération':'Entre les tours';
     document.getElementById('chipExo').textContent=`${s.exo}/${cfg.exo}`;
     document.getElementById('chipTour').textContent=`${s.tour}/${cfg.tours}`;
