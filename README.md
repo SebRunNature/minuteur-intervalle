@@ -113,3 +113,6 @@ Elle utilise l'API Web Speech (voix), l'API Wake Lock (écran allumé) et le `lo
 ## Auteur
 
 **Seb Run Nature**
+
+- 🌐 Site web : [run-nature.com](https://run-nature.com)
+- 👤 À propos : [À propos de Run Nature Luxembourg](https://run-nature.com/a-propos-de-run-nature-luxembourg/)
