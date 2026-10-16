@@ -92,19 +92,6 @@ body.phase-marche{background:var(--trepos-bg)}
 .mode-tab.active{background:var(--green);color:#fff}
 .mode-tab .ic{width:1em;height:1em}
 
-/* ── [CSS] TRAIL — sélecteur terrain ─── */
-.terrain-row{display:flex;gap:8px;margin:0 18px 10px}
-.terrain-pill{flex:1;text-align:center;padding:10px 6px;border-radius:12px;background:var(--card);border:1.5px solid var(--border);cursor:pointer;transition:all .2s;position:relative}
-.terrain-pill.active{border-color:var(--green);background:var(--effort-bg);box-shadow:0 0 0 1px var(--green)}
-.terrain-pill .ic{width:1.3em;height:1.3em;color:var(--muted);margin-bottom:4px}
-.terrain-pill.active .ic{color:var(--green)}
-.terrain-pill-label{font-size:.72rem;font-weight:700;color:var(--text)}
-.terrain-pill.active .terrain-pill-label{color:var(--green-bright)}
-.terrain-check{display:none;position:absolute;top:-6px;right:-6px;width:18px;height:18px;border-radius:50%;background:var(--green);color:#fff;align-items:center;justify-content:center}
-.terrain-check svg{width:11px;height:11px;stroke-width:3}
-.terrain-pill.active .terrain-check{display:flex}
-.terrain-info{margin:0 18px 12px;background:var(--card2);border-radius:10px;padding:8px 12px;font-size:.72rem;color:var(--muted);line-height:1.5}
-.terrain-info b{color:var(--text);font-weight:700}
 .trail-note{background:rgba(232,160,32,.12);border:1px solid rgba(232,160,32,.35);color:#e8a020;border-radius:8px;padding:7px 10px;font-size:.72rem;font-weight:600;line-height:1.4;margin-bottom:8px}
 
 /* ── [CSS] TRAIL — générateur ─── */
@@ -518,26 +505,6 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:') {
 
   <div id="trailConfigWrap" style="display:none">
 
-    <div class="terrain-row">
-      <div class="terrain-pill active" id="terrainTapis" onclick="setTerrainProfile('tapis')">
-        <div class="terrain-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
-        <svg class="ic"><use href="#i-barbell"/></svg>
-        <div class="terrain-pill-label">Tapis</div>
-      </div>
-      <div class="terrain-pill" id="terrainVallonne" onclick="setTerrainProfile('vallonne')">
-        <div class="terrain-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
-        <svg class="ic"><use href="#i-mountain"/></svg>
-        <div class="terrain-pill-label">Vallonné</div>
-      </div>
-      <div class="terrain-pill" id="terrainPlat" onclick="setTerrainProfile('plat')">
-        <div class="terrain-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
-        <svg class="ic"><use href="#i-refresh"/></svg>
-        <div class="terrain-pill-label">Plat / ville</div>
-      </div>
-    </div>
-
-    <div class="terrain-info" id="terrainInfo"></div>
-
     <div class="gen-card">
       <div class="gen-card-title">Générateur automatique</div>
       <div class="gen-card-sub">Indique ta distance, ton D+ et la durée voulue, la séance se génère toute seule</div>
@@ -788,7 +755,7 @@ function announcePhase(ph, s){
       sommet = `Sommet ${n} sur ${trail.tours} atteint ! `;
     }
     if(s.label){ speak(sommet + s.label, true); return; }
-    const msg = TERRAIN_MSG[terrainProfile] && TERRAIN_MSG[terrainProfile][ph];
+    const msg = TRAIL_MSG[ph];
     speak(sommet + (msg ? msg() : ph), true);
     return;
   }
@@ -890,7 +857,6 @@ function detectActivePreset(){
 ═══════════════════════════════════════════════ */
 
 let appMode = localStorage.getItem('minuteurMode') || 'hiit'; // 'hiit' | 'trail'
-let terrainProfile = localStorage.getItem('terrainProfile') || 'tapis'; // 'tapis' | 'vallonne' | 'plat'
 
 const TRAIL_DEFAULT = { monteeSec:180, platSec:120, descenteSec:120, marcheSec:60, tours:4, dist:10, dplus:350, duree:'', inclineMontee:7, inclineDescente:1, isSeche:false, blocMin:5, useDescente:true, usePlat:false, useMarche:false };
 // Inclinaisons tapis : 2 % pour simuler la route (plat, marche récup, échauffement, retour au calme)
@@ -931,34 +897,16 @@ function saveTrail(){
 const trail = loadTrail();
 let hasTrailSeq = localStorage.getItem('minuteurTrailGenerated') === 'yes';
 
-// Messages vocaux selon le profil de terrain choisi
-const TERRAIN_MSG = {
-  tapis: {
-    montee:   () => trail.isSeche
-      ? `Montée sèche. Marche rapide, inclinaison à ${trail.inclineMontee} pour cent.`
-      : `Montée. Passe l'inclinaison à ${trail.inclineMontee} pour cent.`,
-    plat:     () => `Plat. Inclinaison à ${TRAIL_INCLINE_PLAT} pour cent.`,
-    descente: () => trail.inclineDescente === 0
-      ? `Grande descente. Inclinaison à zéro pour cent.`
-      : `Descente. Redescends l'inclinaison à ${trail.inclineDescente} pour cent.`,
-    marche:   () => `Marche récupération. Inclinaison à ${TRAIL_INCLINE_PLAT} pour cent.`
-  },
-  vallonne: {
-    montee:   () => trail.isSeche
-      ? `Montée sèche. Marche rapide obligatoire si tu as une vraie côte, sinon accélère fort.`
-      : `Montée. Prends une côte si tu en as une, sinon pousse l'allure.`,
-    plat:     () => `Terrain plat. Allure normale.`,
-    descente: () => `Descente. Relâche si tu es en pente, sinon récupération active.`,
-    marche:   () => `Marche récupération.`
-  },
-  plat: {
-    montee:   () => trail.isSeche
-      ? `Montée sèche simulée. Sprint court et très intense.`
-      : `Montée simulée. Accélère nettement.`,
-    plat:     () => `Plat. Reviens à ton allure normale.`,
-    descente: () => `Descente simulée. Relâche complètement, récupération active.`,
-    marche:   () => `Marche récupération.`
-  }
+// Messages vocaux du guidage trail (tapis)
+const TRAIL_MSG = {
+  montee:   () => trail.isSeche
+    ? `Montée sèche. Marche rapide, inclinaison à ${trail.inclineMontee} pour cent.`
+    : `Montée. Passe l'inclinaison à ${trail.inclineMontee} pour cent.`,
+  plat:     () => `Plat. Inclinaison à ${TRAIL_INCLINE_PLAT} pour cent.`,
+  descente: () => trail.inclineDescente === 0
+    ? `Grande descente. Inclinaison à zéro pour cent.`
+    : `Descente. Redescends l'inclinaison à ${trail.inclineDescente} pour cent.`,
+  marche:   () => `Marche récupération. Inclinaison à ${TRAIL_INCLINE_PLAT} pour cent.`
 };
 
 function switchMode(mode){
@@ -969,23 +917,6 @@ function switchMode(mode){
   document.getElementById('hiitConfigWrap').style.display = mode==='hiit' ? '' : 'none';
   document.getElementById('trailConfigWrap').style.display = mode==='trail' ? '' : 'none';
   updateTotalDurDisplay();
-}
-
-const TERRAIN_INFO = {
-  tapis: () => `<b>Sur tapis :</b> règle l'inclinaison indiquée sur chaque segment de l'aperçu ci-dessous.`,
-  vallonne: () => `<b>Terrain vallonné :</b> montée → vraie côte si possible · descente → profite de la pente · marche récup → marche lente.`,
-  plat: () => `<b>Fartlek structuré</b> (aucun relief nécessaire) : montée → accélère nettement · descente → relâche · marche récup → marche lente.`
-};
-
-function setTerrainProfile(p){
-  terrainProfile = p;
-  localStorage.setItem('terrainProfile', p);
-  const map = {tapis:'Tapis', vallonne:'Vallonne', plat:'Plat'};
-  Object.entries(map).forEach(([key, id]) => {
-    document.getElementById('terrain'+id).classList.toggle('active', key === p);
-  });
-  document.getElementById('terrainInfo').innerHTML = TERRAIN_INFO[p]();
-  if(hasTrailSeq) renderTrailPreview();
 }
 
 function generateTrailSequence(silent=false){
@@ -1054,19 +985,18 @@ function renderTrailPreview(){
 
   document.getElementById('trailPreviewTitle').textContent = `Séquence générée — ${trail.tours} tours`;
 
-  const isTapis = terrainProfile === 'tapis';
   const secheNote = trail.isSeche
     ? `<div class="trail-note">Profil très raide (${trail.inclineMontee}%) : montée en marche rapide.</div>`
     : '';
   const secOf = {montee:trail.monteeSec, plat:trail.platSec, descente:trail.descenteSec, marche:trail.marcheSec};
   const segs = trailPhases().map(ph => ({
-    type:ph, name:trailName({phase:ph}), sec:secOf[ph], incline: isTapis ? `${trailIncl(ph)}%` : null
+    type:ph, name:trailName({phase:ph}), sec:secOf[ph], incline: `${trailIncl(ph)}%`
   }));
   // Détail du calcul + nombre de changements d'inclinaison (ce que l'utilisateur règle à la main sur un tapis)
-  const parts = segs.map(g => `${g.sec/60} min ${g.name.toLowerCase()}${isTapis ? ` ${g.incline.replace('%',' %')}` : ''}`).join(' + ');
+  const parts = segs.map(g => `${g.sec/60} min ${g.name.toLowerCase()} ${g.incline.replace('%',' %')}`).join(' + ');
   const seq = trailSeq();
   const changes = seq.filter((q,i) => i>0 && trailIncl(q.phase) !== trailIncl(seq[i-1].phase)).length;
-  const detail = `<div class="trail-note">5 min échauffement + ${trail.tours > 1 && segs.length > 1 ? `${trail.tours} × (${parts})` : trail.tours > 1 ? `${trail.tours} × ${parts}` : parts} + 5 min retour au calme = ${fmt(trailTotalSec())}${isTapis ? `<br>${changes} changements d'inclinaison · échauffement et retour au calme à ${TRAIL_INCLINE_PLAT} %` : ''}</div>`;
+  const detail = `<div class="trail-note">5 min échauffement + ${trail.tours > 1 && segs.length > 1 ? `${trail.tours} × (${parts})` : trail.tours > 1 ? `${trail.tours} × ${parts}` : parts} + 5 min retour au calme = ${fmt(trailTotalSec())}<br>${changes} changements d'inclinaison · échauffement et retour au calme à ${TRAIL_INCLINE_PLAT} %</div>`;
   list.innerHTML = secheNote + detail + segs.map(s => `
     <div class="seg-row">
       <div class="seg-dot ${s.type}"></div>
@@ -1328,13 +1258,10 @@ function trailName(seg){
 /* Préavis de 10 s avant un changement : de quoi toucher le tapis sans stress (null = rien à changer) */
 function trailPreavis(s, nx){
   if(!nx || s.sec < 15) return null;
-  if(terrainProfile === 'tapis'){
-    const a = trailIncl(s.phase), b = trailIncl(nx.phase);
-    if(a === b) return null;
-    const verb = b > a ? 'monte' : 'descends';
-    return {text:`${verb} à ${b} %`, voice:`${verb} à ${b === 0 ? 'zéro' : b} pour cent`};
-  }
-  return {text:trailName(nx), voice:trailName(nx)};
+  const a = trailIncl(s.phase), b = trailIncl(nx.phase);
+  if(a === b) return null;
+  const verb = b > a ? 'monte' : 'descends';
+  return {text:`${verb} à ${b} %`, voice:`${verb} à ${b === 0 ? 'zéro' : b} pour cent`};
 }
 function renderPeaks(s){
   const N = trail.tours;
@@ -1437,21 +1364,14 @@ function renderTimer(){
 
   const badge=document.getElementById('inclBadge'), nextBox=document.getElementById('nextBox');
   if(appMode==='trail'){
-    const tapis = terrainProfile==='tapis';
-    let sub='';
-    if(s.label){
-      sub=s.label;
-    } else if(!tapis){
-      sub={montee:'Effort soutenu',plat:'Allure normale',descente:'Récupération active',marche:'Marche'}[ph]||'';
-    }
-    document.getElementById('timerSub').textContent=sub;
-    // Gros pourcentage d'inclinaison (tapis uniquement), avec la flèche de la phase
-    badge.className='incl-badge '+ph+(tapis?' show':'');
-    badge.innerHTML = tapis ? `${iconSvg(TRAIL_ICON[ph])}${trailIncl(ph)}<small>%</small>` : '';
+    document.getElementById('timerSub').textContent = s.label || '';
+    // Gros pourcentage d'inclinaison, avec la flèche de la phase
+    badge.className='incl-badge show '+ph;
+    badge.innerHTML = `${iconSvg(TRAIL_ICON[ph])}${trailIncl(ph)}<small>%</small>`;
     // Aperçu de la phase suivante
     const nx=state.seq[state.idx+1];
     if(nx){
-      const nIncl = tapis ? ` ${trailIncl(nx.phase)} %` : '';
+      const nIncl = ` ${trailIncl(nx.phase)} %`;
       const nTour = (nx.tour && nx.tour!==s.tour && nx.tour<=trail.tours) ? ` · tour ${nx.tour}` : '';
       nextBox.innerHTML = `<span class="${nx.phase}">${iconSvg(TRAIL_ICON[nx.phase])}</span><span>Ensuite${nTour}<b>${trailName(nx)}${nIncl}</b></span><span class="next-dur">${fmt(nx.sec)}</span>`;
     } else {
@@ -1595,7 +1515,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // Ancienne séance enregistrée avant les blocs longs : on la régénère avec les nouvelles règles
   try{ const raw = JSON.parse(localStorage.getItem('minuteurTrail')); if(hasTrailSeq && raw && raw.blocMin===undefined) generateTrailSequence(true); }catch(e){}
   switchMode(appMode);
-  setTerrainProfile(terrainProfile); // met aussi à jour l'aperçu si une séquence existe déjà
+  try{ localStorage.removeItem('terrainProfile'); }catch(e){} // ancien réglage supprimé
+  if(hasTrailSeq) renderTrailPreview(); // aperçu de la séquence déjà enregistrée
 });
 
 document.addEventListener('click',e=>{if(editingCard&&!e.target.closest('#card'+cap(editingCard))){saveCard(editingCard);document.getElementById('val'+cap(editingCard)).style.display='';document.getElementById('edit'+cap(editingCard)).style.display='none';document.getElementById('card'+cap(editingCard)).classList.remove('editing');editingCard=null;}},true);
