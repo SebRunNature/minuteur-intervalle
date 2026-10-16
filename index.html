@@ -780,9 +780,16 @@ document.querySelectorAll('#vsPresets .vs-chip').forEach(c => c.onclick = () => 
 
 function announcePhase(ph, s){
   if(appMode === 'trail'){
-    if(s.label){ speak(s.label, true); return; }
+    // Fin d'une montée : on annonce le sommet atteint avant la phase suivante
+    let sommet = '';
+    const prev = state && state.seq[state.idx-1];
+    if(prev && prev.phase==='montee'){
+      const n = state.seq.slice(0, state.idx).filter(q => q.phase==='montee').length;
+      sommet = `Sommet ${n} sur ${trail.tours} atteint ! `;
+    }
+    if(s.label){ speak(sommet + s.label, true); return; }
     const msg = TERRAIN_MSG[terrainProfile] && TERRAIN_MSG[terrainProfile][ph];
-    speak(msg ? msg() : ph, true);
+    speak(sommet + (msg ? msg() : ph), true);
     return;
   }
   const phaseTexts = {
@@ -1585,6 +1592,8 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('genDplus').value = trail.dplus;
   document.getElementById('genDuree').value = trail.duree;
   renderBlockOptions();
+  // Ancienne séance enregistrée avant les blocs longs : on la régénère avec les nouvelles règles
+  try{ const raw = JSON.parse(localStorage.getItem('minuteurTrail')); if(hasTrailSeq && raw && raw.blocMin===undefined) generateTrailSequence(true); }catch(e){}
   switchMode(appMode);
   setTerrainProfile(terrainProfile); // met aussi à jour l'aperçu si une séquence existe déjà
 });

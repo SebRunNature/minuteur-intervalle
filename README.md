@@ -70,7 +70,7 @@ Le **nombre de tours** se calcule ainsi :
 ### Pendant la séance
 
 - **Flèche et couleur par phase**, gros pourcentage d'inclinaison au centre du cercle (tapis).
-- **Sommets** : un sommet par montée, avec une barre de **montée cumulée**. Aucune vitesse n'est nécessaire.
+- **Sommets** : un sommet par montée, avec une barre de **montée cumulée**. La voix annonce « Sommet 2 sur 3 atteint ! » à la fin de chaque montée. Aucune vitesse n'est nécessaire.
 - **Préavis de 10 secondes** avant un changement d'inclinaison : bandeau orange (« Dans 10 s : descends à 1 % ») et annonce vocale, pour avoir le temps de régler le tapis.
 - Aperçu de la phase suivante et mini profil de la séance avec ta position.
 
