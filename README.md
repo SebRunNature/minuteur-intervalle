@@ -8,7 +8,7 @@ Deux modes : **Intervalles** (HIIT, Tabata, côtes, endurance) et **Trail** (sé
 ## Fonctionnalités
 
 - **Mode Intervalles** : réglage de l'effort, du repos, du nombre d'exercices, de tours et du repos entre les tours. Protocoles prédéfinis : **Tabata**, **HIIT**, **Côtes**, **Endurance**.
-- **Mode Trail** : générateur automatique de séance à partir de la distance, du D+ et de la durée.
+- **Mode Trail** : générateur automatique de séance à partir de la distance, du D+ et de la durée, avec blocs longs, phases au choix, sommets et préavis avant chaque changement d'inclinaison.
 - **Guidage vocal** en français et bips (annonce des phases, compte à rebours 3-2-1, début et fin de séance).
 - **Réglages de la voix** : choix de la voix de l'appareil (homme ou femme), styles *Normale*, *Grave*, *Robot* et *Coach*, curseurs de hauteur et de vitesse, bouton de test.
 - **Écran de séance clair** : chrono dans un grand cercle, flèche par phase, pourcentage d'inclinaison bien visible, aperçu de la phase suivante et mini profil de la séance.
@@ -28,19 +28,20 @@ Tu renseignes :
 | **Distance** (km) | Sert au ratio de dénivelé, et à la durée si elle est laissée vide |
 | **D+** (m) | Sert au ratio de dénivelé |
 | **Durée** (min), facultative | Durée visée de la séance. Vide = **automatique** |
+| **Longueur des blocs** | 3, 5 ou 8 min pour chaque montée et chaque descente |
+| **Phases de chaque tour** | Montée (toujours), **Descente** (activée par défaut), **Plat** et **Marche récup** (désactivés par défaut) |
 
-Le **ratio de dénivelé** (D+ ÷ distance, en m/km) choisit le profil de la montée :
+Sur un tapis manuel, chaque changement d'inclinaison demande un geste : les **blocs longs** et les **phases au choix** réduisent le nombre de changements. L'aperçu indique le nombre de changements d'inclinaison de la séance.
 
-| Ratio | Montée | Inclinaison | Descente |
-|---|---|---|---|
-| < 20 | 2 min | 5 % | 1 % |
-| 20 à 60 | 3 min | 7 % | 1 % |
-| 60 à 100 | 4 min | 9 % | 1 % |
-| 100 à 150 | 3 min | 12 % | **0 %** (grande descente) |
-| ≥ 150 | 2 min, **montée sèche** (marche rapide) | 15 % | **0 %** (grande descente) |
+Le **ratio de dénivelé** (D+ ÷ distance, en m/km) choisit l'inclinaison de la montée et celle de la descente :
 
-Chaque **tour** enchaîne quatre phases : **montée → plat → descente → marche récup**.
-La durée de la descente vaut environ 70 % de celle de la montée, le plat dure 2 min et la marche récup 1 min.
+| Ratio | Montée | Descente |
+|---|---|---|
+| < 20 | 5 % | 1 % |
+| 20 à 60 | 7 % | 1 % |
+| 60 à 100 | 9 % | 1 % |
+| 100 à 150 | 12 % | **0 %** (grande descente) |
+| ≥ 150 | 15 % (**montée sèche**, marche rapide) | **0 %** (grande descente) |
 
 ### Durée totale estimée
 
@@ -48,14 +49,14 @@ La durée de la descente vaut environ 70 % de celle de la montée, le plat dure 
 durée totale = 5 min d'échauffement + (nombre de tours × durée d'un tour) + 5 min de retour au calme
 ```
 
+La durée d'un tour est la somme des phases activées (montée et descente = longueur des blocs, plat = 2 min, marche récup = 1 min).
+
 Le **nombre de tours** se calcule ainsi :
 
 - **Durée saisie** : `tours = (durée − 10 min) ÷ durée d'un tour`, arrondi, avec 1 tour minimum. La durée réelle peut donc s'écarter un peu de la cible (c'est un multiple de tour).
 - **Durée vide (automatique)** : le nombre de tours est déduit de la distance (distance ÷ 2,5, entre 3 et 8 tours ; distance ÷ 1,5, entre 4 et 10 tours en montée sèche), pour que la séance reste cohérente (30 km ne donne pas une séance de 45 min).
 
-**Exemple** : 10 km, 500 m de D+, 45 min → ratio 50 → montée de 3 min à 7 %, plat 2 min, descente 2 min, marche 1 min = 8 min par tour → 4 tours → 5 + 32 + 5 = **42 min**.
-
-L'aperçu de la séance affiche le détail de ce calcul.
+**Exemple** : 6,7 km, 140 m de D+, 40 min, blocs de 5 min → ratio 21 → montée à 7 %, descente à 1 % → 10 min par tour → 3 tours → 5 + 30 + 5 = **40 min**, soit 7 changements d'inclinaison.
 
 ### Inclinaisons sur tapis
 
@@ -65,6 +66,13 @@ L'aperçu de la séance affiche le détail de ce calcul.
 | Montée | 5 à 15 % selon le profil |
 | Descente | **1 %** |
 | Grande descente | **0 %** |
+
+### Pendant la séance
+
+- **Flèche et couleur par phase**, gros pourcentage d'inclinaison au centre du cercle (tapis).
+- **Sommets** : un sommet par montée, avec une barre de **montée cumulée**. La voix annonce « Sommet 2 sur 3 atteint ! » à la fin de chaque montée. Aucune vitesse n'est nécessaire.
+- **Préavis de 10 secondes** avant un changement d'inclinaison : bandeau orange (« Dans 10 s : descends à 1 % ») et annonce vocale, pour avoir le temps de régler le tapis.
+- Aperçu de la phase suivante et mini profil de la séance avec ta position.
 
 ### Terrains
 
