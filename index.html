@@ -181,6 +181,33 @@ body.phase-marche{background:var(--trepos-bg)}
 .pf-dim{opacity:.28}
 .pf-cursor{stroke:var(--text);stroke-width:1.5;stroke-dasharray:3 3;opacity:.6}
 .pf-dot{fill:var(--text);stroke:var(--card);stroke-width:3}
+.gen-lbl{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:2px 0 6px}
+.blk-chips{display:flex;gap:6px;margin-bottom:12px}
+.blk-chip{flex:1;text-align:center;padding:9px 4px;border-radius:10px;background:var(--card2);border:1px solid var(--border);font-family:var(--font-main);font-size:.82rem;font-weight:700;color:var(--muted);cursor:pointer}
+.blk-chip.act{border-color:var(--green);color:var(--green-bright);background:rgba(29,158,117,.14)}
+.phase-tgs{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.phase-tg{display:flex;align-items:center;gap:8px;background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:7px 10px;font-size:.84rem;font-weight:600}
+.phase-tg .ic{width:1.2em;height:1.2em;stroke-width:3}
+.phase-tg small{color:var(--muted);font-size:.68rem;font-weight:600}
+.phase-tg .toggle-track{margin-left:auto;flex-shrink:0}
+.phase-tg.fixed{opacity:.75}
+.phase-tg .t-montee{color:var(--green-bright)}.phase-tg .t-plat{color:var(--muted)}.phase-tg .t-descente{color:#a8c8f8}.phase-tg .t-marche{color:#f5c563}
+.warn-banner{display:none;width:100%;max-width:360px;background:#e8a020;color:#241a00;border-radius:12px;padding:9px 12px;font-family:var(--font-display);font-weight:800;font-size:.9rem;text-align:center}
+.warn-banner.show{display:block}
+.ring-fill.warn{stroke:#e8a020}
+.timer-big.warn{color:#f5c563}
+.peaks-box{display:none;width:100%;max-width:360px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:9px 12px}
+.peaks-box.show{display:block}
+.peaks-head{display:flex;justify-content:space-between;align-items:center;font-family:var(--font-display);font-weight:700;font-size:.9rem;margin-bottom:7px}
+.peaks{font-size:1.2rem;letter-spacing:4px;line-height:1}
+.peaks i{font-style:normal;opacity:.25}.peaks i.on{opacity:1;color:#f5c563}.peaks i.cur{opacity:.7;color:#f5c563;animation:pk 1.2s ease-in-out infinite}
+@keyframes pk{50%{opacity:.25}}
+.peaks-bar{height:7px;border-radius:4px;background:rgba(127,127,127,.25);overflow:hidden}
+.peaks-bar div{height:100%;background:var(--green-bright);transition:width .5s linear}
+.peaks-row{display:flex;align-items:center;gap:10px}
+.peaks-row .peaks-bar{flex:1}
+.peaks-box small{font-size:.68rem;font-weight:700;color:var(--muted);white-space:nowrap}
+@media(max-height:680px){.ring-wrap{width:215px;height:215px}.timer-big{font-size:3.3rem}.session-profile svg{height:54px}}
 .timer-total-pill{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:5px 16px;font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);display:inline-flex;align-items:center;gap:6px}
 .timer-total-pill span{font-family:var(--font-display);font-weight:700;font-size:1.05rem;color:var(--green-bright);letter-spacing:-.3px}
 .progress-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;width:100%}
@@ -537,6 +564,19 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:') {
           </div>
         </div>
       </div>
+      <div class="gen-lbl">Longueur des blocs</div>
+      <div class="blk-chips" id="blkChips">
+        <button class="blk-chip" data-m="3" onclick="setBlocMin(3)">3 min</button>
+        <button class="blk-chip" data-m="5" onclick="setBlocMin(5)">5 min</button>
+        <button class="blk-chip" data-m="8" onclick="setBlocMin(8)">8 min</button>
+      </div>
+      <div class="gen-lbl">Phases de chaque tour</div>
+      <div class="phase-tgs">
+        <div class="phase-tg fixed"><span class="t-montee"><svg class="ic"><use href="#i-arrow-up"/></svg></span> Montée <small>toujours</small></div>
+        <div class="phase-tg"><span class="t-descente"><svg class="ic"><use href="#i-arrow-down"/></svg></span> Descente <small id="tgDescenteSub"></small><div class="toggle-track" id="tgDescente" onclick="togglePhase('Descente')"><div class="toggle-thumb"></div></div></div>
+        <div class="phase-tg"><span class="t-plat"><svg class="ic"><use href="#i-arrow-flat"/></svg></span> Plat <small>2 %</small><div class="toggle-track" id="tgPlat" onclick="togglePhase('Plat')"><div class="toggle-thumb"></div></div></div>
+        <div class="phase-tg"><span class="t-marche"><svg class="ic"><use href="#i-walk"/></svg></span> Marche récup <small>2 %</small><div class="toggle-track" id="tgMarche" onclick="togglePhase('Marche')"><div class="toggle-thumb"></div></div></div>
+      </div>
       <button class="btn-generate" onclick="generateTrailSequence()">
         <svg class="ic"><use href="#i-bolt"/></svg> Générer la séance
       </button>
@@ -565,6 +605,7 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:') {
   <div class="timer-body">
     <div style="display:flex;flex-direction:column;align-items:center;gap:8px;width:100%">
       <div class="timer-total-pill">Durée restante &nbsp;<span id="chipTotal">09:00</span></div>
+      <div class="warn-banner" id="warnBanner"></div>
       <div class="phase-label effort" id="phaseLabel">EFFORT</div>
     </div>
 
@@ -580,9 +621,11 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:') {
       </div>
     </div>
 
+    <div class="peaks-box" id="peaksBox"></div>
+
     <div class="next-box" id="nextBox"></div>
 
-    <div class="progress-row">
+    <div class="progress-row" id="progressRow">
       <div class="prog-chip"><div class="prog-chip-val" id="chipExo">1/8</div><div class="prog-chip-lbl">Exercice</div></div>
       <div class="prog-chip"><div class="prog-chip-val" id="chipTour">1/2</div><div class="prog-chip-lbl">Tour</div></div>
     </div>
@@ -842,11 +885,32 @@ function detectActivePreset(){
 let appMode = localStorage.getItem('minuteurMode') || 'hiit'; // 'hiit' | 'trail'
 let terrainProfile = localStorage.getItem('terrainProfile') || 'tapis'; // 'tapis' | 'vallonne' | 'plat'
 
-const TRAIL_DEFAULT = { monteeSec:180, platSec:120, descenteSec:120, marcheSec:60, tours:4, dist:10, dplus:350, duree:'', inclineMontee:7, inclineDescente:1, isSeche:false };
+const TRAIL_DEFAULT = { monteeSec:180, platSec:120, descenteSec:120, marcheSec:60, tours:4, dist:10, dplus:350, duree:'', inclineMontee:7, inclineDescente:1, isSeche:false, blocMin:5, useDescente:true, usePlat:false, useMarche:false };
 // Inclinaisons tapis : 2 % pour simuler la route (plat, marche récup, échauffement, retour au calme)
 const TRAIL_INCLINE_PLAT = 2;
 const TRAIL_WARM_SEC = 300; // échauffement et retour au calme, 5 min chacun
-const TRAIL_STEPS_PER_TOUR = 4; // montée, plat, descente, marche
+
+/* Phases activées dans chaque tour (la montée est toujours là), dans l'ordre montée → plat → descente → marche */
+function trailPhases(){
+  return ['montee', trail.usePlat && 'plat', trail.useDescente && 'descente', trail.useMarche && 'marche'].filter(Boolean);
+}
+function trailSeq(){
+  const secs = {montee:trail.monteeSec, plat:trail.platSec, descente:trail.descenteSec, marche:trail.marcheSec};
+  const phases = trailPhases();
+  const seq = [{phase:'plat', sec:TRAIL_WARM_SEC, tour:0, exo:0, label:'Échauffement'}];
+  for(let t=1;t<=trail.tours;t++) phases.forEach((ph,i) => seq.push({phase:ph, sec:secs[ph], tour:t, exo:i+1}));
+  seq.push({phase:'plat', sec:TRAIL_WARM_SEC, tour:trail.tours+1, exo:0, label:'Retour au calme'});
+  return seq;
+}
+function renderBlockOptions(){
+  document.querySelectorAll('#blkChips .blk-chip').forEach(c => c.classList.toggle('act', +c.dataset.m === trail.blocMin));
+  document.getElementById('tgDescente').classList.toggle('on', trail.useDescente);
+  document.getElementById('tgPlat').classList.toggle('on', trail.usePlat);
+  document.getElementById('tgMarche').classList.toggle('on', trail.useMarche);
+  document.getElementById('tgDescenteSub').textContent = `${trail.inclineDescente} %`;
+}
+function setBlocMin(m){ trail.blocMin = m; saveTrail(); renderBlockOptions(); if(hasTrailSeq) generateTrailSequence(true); }
+function togglePhase(name){ trail['use'+name] = !trail['use'+name]; saveTrail(); renderBlockOptions(); if(hasTrailSeq) generateTrailSequence(true); }
 function loadTrail(){
   try {
     const saved = JSON.parse(localStorage.getItem('minuteurTrail'));
@@ -917,7 +981,7 @@ function setTerrainProfile(p){
   if(hasTrailSeq) renderTrailPreview();
 }
 
-function generateTrailSequence(){
+function generateTrailSequence(silent=false){
   const dist  = Math.max(1, +document.getElementById('genDist').value || 10);
   const dplus = Math.max(0, +document.getElementById('genDplus').value || 0);
   const dureeInput = document.getElementById('genDuree').value.trim(); // vide = automatique
@@ -926,20 +990,23 @@ function generateTrailSequence(){
   // Paliers d'intensité : au-delà d'un certain ratio, une montée réelle devient
   // trop raide pour être courue en continu — elle se transforme en portions
   // courtes et très inclinées, façon marche rapide / montée sèche.
-  let monteeMin, inclineMontee, isSeche;
-  if(ratio < 20)       { monteeMin=2; inclineMontee=5;  isSeche=false; }
-  else if(ratio < 60)  { monteeMin=3; inclineMontee=7;  isSeche=false; }
-  else if(ratio < 100) { monteeMin=4; inclineMontee=9;  isSeche=false; }
-  else if(ratio < 150) { monteeMin=3; inclineMontee=12; isSeche=false; }
-  else                 { monteeMin=2; inclineMontee=15; isSeche=true;  }
+  // Le ratio ne règle plus que l'inclinaison : la longueur des blocs est choisie
+  // par l'utilisateur (blocs longs = peu de changements d'inclinaison sur un tapis manuel).
+  let inclineMontee, isSeche;
+  if(ratio < 20)       { inclineMontee=5;  isSeche=false; }
+  else if(ratio < 60)  { inclineMontee=7;  isSeche=false; }
+  else if(ratio < 100) { inclineMontee=9;  isSeche=false; }
+  else if(ratio < 150) { inclineMontee=12; isSeche=false; }
+  else                 { inclineMontee=15; isSeche=true;  }
 
-  const descenteMin = Math.max(1, Math.round(monteeMin*0.7));
+  const monteeMin    = trail.blocMin;
+  const descenteMin  = trail.blocMin;
   const platMin      = 2;
   const marcheMin    = 1;
   // Grande descente (0 %) sur profil raide, petite descente (1 %) sinon
   const inclineDescente = ratio >= 100 ? 0 : 1;
   // Nombre de tours déduit de la durée cible : (durée − échauffement − retour au calme) / durée d'un tour
-  const tourMin = monteeMin + descenteMin + platMin + marcheMin;
+  const tourMin = monteeMin + (trail.useDescente ? descenteMin : 0) + (trail.usePlat ? platMin : 0) + (trail.useMarche ? marcheMin : 0);
   const warmMin = 2*TRAIL_WARM_SEC/60;
   let tours;
   if(dureeInput === ''){
@@ -967,7 +1034,8 @@ function generateTrailSequence(){
 
   renderTrailPreview();
   const label = isSeche ? 'Montée sèche' : 'Montée';
-  speak(`Séance générée. ${tours} tours, ${label} de ${monteeMin} minutes à ${inclineMontee} pour cent.`, true);
+  renderBlockOptions();
+  if(!silent) speak(`Séance générée. ${tours} tours, ${label} de ${monteeMin} minutes à ${inclineMontee} pour cent.`, true);
 }
 
 function renderTrailPreview(){
@@ -981,16 +1049,17 @@ function renderTrailPreview(){
 
   const isTapis = terrainProfile === 'tapis';
   const secheNote = trail.isSeche
-    ? `<div class="trail-note">Profil très raide (${trail.inclineMontee}%) : montée en marche rapide, segments courts et répétés.</div>`
+    ? `<div class="trail-note">Profil très raide (${trail.inclineMontee}%) : montée en marche rapide.</div>`
     : '';
-  const segs = [
-    {type:'montee',   name: trail.isSeche ? 'Montée sèche' : 'Montée', sec:trail.monteeSec, incline: isTapis ? `${trail.inclineMontee}%` : null},
-    {type:'plat',     name:'Plat',         sec:trail.platSec,     incline: isTapis ? `${TRAIL_INCLINE_PLAT}%` : null},
-    {type:'descente', name: trail.inclineDescente === 0 ? 'Grande descente' : 'Descente', sec:trail.descenteSec, incline: isTapis ? `${trail.inclineDescente}%` : null},
-    {type:'marche',   name:'Marche récup', sec:trail.marcheSec,   incline: isTapis ? `${TRAIL_INCLINE_PLAT}%` : null},
-  ];
-  const perTour = trail.monteeSec + trail.platSec + trail.descenteSec + trail.marcheSec;
-  const detail = `<div class="trail-note">5 min échauffement + ${trail.tours} × ${fmt(perTour)} + 5 min retour au calme = ${fmt(trailTotalSec())}${isTapis ? ` · plat, marche, échauffement et retour au calme à ${TRAIL_INCLINE_PLAT}%` : ''}</div>`;
+  const secOf = {montee:trail.monteeSec, plat:trail.platSec, descente:trail.descenteSec, marche:trail.marcheSec};
+  const segs = trailPhases().map(ph => ({
+    type:ph, name:trailName({phase:ph}), sec:secOf[ph], incline: isTapis ? `${trailIncl(ph)}%` : null
+  }));
+  // Détail du calcul + nombre de changements d'inclinaison (ce que l'utilisateur règle à la main sur un tapis)
+  const parts = segs.map(g => `${g.sec/60} min ${g.name.toLowerCase()}${isTapis ? ` ${g.incline.replace('%',' %')}` : ''}`).join(' + ');
+  const seq = trailSeq();
+  const changes = seq.filter((q,i) => i>0 && trailIncl(q.phase) !== trailIncl(seq[i-1].phase)).length;
+  const detail = `<div class="trail-note">5 min échauffement + ${trail.tours > 1 && segs.length > 1 ? `${trail.tours} × (${parts})` : trail.tours > 1 ? `${trail.tours} × ${parts}` : parts} + 5 min retour au calme = ${fmt(trailTotalSec())}${isTapis ? `<br>${changes} changements d'inclinaison · échauffement et retour au calme à ${TRAIL_INCLINE_PLAT} %` : ''}</div>`;
   list.innerHTML = secheNote + detail + segs.map(s => `
     <div class="seg-row">
       <div class="seg-dot ${s.type}"></div>
@@ -1003,8 +1072,7 @@ function renderTrailPreview(){
 }
 
 function trailTotalSec(){
-  const perTour = trail.monteeSec + trail.platSec + trail.descenteSec + trail.marcheSec;
-  return TRAIL_WARM_SEC + perTour*trail.tours + TRAIL_WARM_SEC; // + échauffement et retour au calme
+  return trailSeq().reduce((a,q) => a + q.sec, 0); // échauffement + tours + retour au calme
 }
 
 function hiitTotalSec(){
@@ -1152,14 +1220,7 @@ function buildState(){
 
   let seq=[];
   if(appMode === 'trail'){
-    seq.push({phase:'plat', sec:TRAIL_WARM_SEC, tour:0, exo:0, label:'Échauffement'});
-    for(let t=1;t<=trail.tours;t++){
-      seq.push({phase:'montee',   sec:trail.monteeSec,   tour:t, exo:1});
-      seq.push({phase:'plat',     sec:trail.platSec,     tour:t, exo:2});
-      seq.push({phase:'descente', sec:trail.descenteSec, tour:t, exo:3});
-      seq.push({phase:'marche',   sec:trail.marcheSec,   tour:t, exo:4});
-    }
-    seq.push({phase:'plat', sec:TRAIL_WARM_SEC, tour:trail.tours+1, exo:0, label:'Retour au calme'});
+    seq = trailSeq();
   } else {
     for(let t=1;t<=cfg.tours;t++){
       for(let e=1;e<=cfg.exo;e++){
@@ -1240,6 +1301,11 @@ function tick(){
     state.secLeft = rem;
     state.totalSec = rem + state.restAfter[state.idx];
     if(rem<=3&&rem>0){bipCountdown();announceCountdown(rem);vib(35);}
+    if(appMode==='trail' && rem===10 && state.preavisFor!==state.idx){
+      state.preavisFor = state.idx;
+      const pv = trailPreavis(state.seq[state.idx], state.seq[state.idx+1]);
+      if(pv) speak(`Dans dix secondes : ${pv.voice}.`);
+    }
     renderTimer();
   }
 }
@@ -1251,6 +1317,30 @@ function trailName(seg){
   if(seg.phase==='montee') return trail.isSeche ? 'Montée sèche' : 'Montée';
   if(seg.phase==='descente') return trail.inclineDescente===0 ? 'Grande descente' : 'Descente';
   return {plat:'Plat', marche:'Marche récup'}[seg.phase];
+}
+/* Préavis de 10 s avant un changement : de quoi toucher le tapis sans stress (null = rien à changer) */
+function trailPreavis(s, nx){
+  if(!nx || s.sec < 15) return null;
+  if(terrainProfile === 'tapis'){
+    const a = trailIncl(s.phase), b = trailIncl(nx.phase);
+    if(a === b) return null;
+    const verb = b > a ? 'monte' : 'descends';
+    return {text:`${verb} à ${b} %`, voice:`${verb} à ${b === 0 ? 'zéro' : b} pour cent`};
+  }
+  return {text:trailName(nx), voice:trailName(nx)};
+}
+function renderPeaks(s){
+  const N = trail.tours;
+  let reached = 0, climb = 0;
+  for(let i=0;i<state.idx;i++){ if(state.seq[i].phase==='montee'){ reached++; climb += state.seq[i].sec; } }
+  const inClimb = s.phase==='montee';
+  if(inClimb) climb += s.sec - state.secLeft;
+  const total = N*trail.monteeSec;
+  const tri = Array.from({length:N}, (_,i) => `<i class="${i<reached?'on':(inClimb&&i===reached?'cur':'')}">▲</i>`).join('');
+  const box = document.getElementById('peaksBox');
+  box.innerHTML = `<div class="peaks-head"><span>Sommet ${inClimb ? reached+1 : reached} / ${N}</span><span class="peaks">${tri}</span></div>
+    <div class="peaks-row"><div class="peaks-bar"><div style="width:${total ? Math.min(100, climb/total*100).toFixed(1) : 0}%"></div></div><small>Montée ${fmt(climb)} / ${fmt(total)}</small></div>`;
+  box.classList.add('show');
 }
 function trailIncl(ph){
   return {montee:trail.inclineMontee, plat:TRAIL_INCLINE_PLAT, descente:trail.inclineDescente, marche:TRAIL_INCLINE_PLAT}[ph];
@@ -1325,7 +1415,14 @@ function renderTimer(){
   }
   lbl.className='phase-label '+ph;
   const ring=document.getElementById('ringFill');
-  ring.className='ring-fill '+ph;
+  const nxt = state.seq[state.idx+1];
+  const pv = (appMode==='trail' && state.secLeft<=10) ? trailPreavis(s, nxt) : null;
+  ring.setAttribute('class','ring-fill '+ph+(pv?' warn':'')); // setAttribute : className est en lecture seule sur un élément SVG
+  document.getElementById('timerBig').classList.toggle('warn', !!pv);
+  const wb = document.getElementById('warnBanner');
+  wb.classList.toggle('show', !!pv);
+  document.querySelector('.timer-total-pill').style.display = pv ? 'none' : ''; // le bandeau prend la place de la durée restante
+  wb.textContent = pv ? `⚠ Dans ${state.secLeft} s : ${pv.text}` : '';
   const C=2*Math.PI*100;
   ring.style.strokeDasharray=C;
   ring.style.strokeDashoffset=C*(1-state.secLeft/Math.max(1,s.sec));
@@ -1354,9 +1451,11 @@ function renderTimer(){
       nextBox.innerHTML = `<span>Dernière phase<b>Bravo, c'est bientôt fini !</b></span>`;
     }
     nextBox.classList.add('show');
-    document.getElementById('chipExo').textContent = s.exo ? `${s.exo}/${TRAIL_STEPS_PER_TOUR}` : '—';
-    document.getElementById('chipTour').textContent = s.tour ? `${s.tour}/${trail.tours}` : '—';
+    renderPeaks(s);
+    document.getElementById('progressRow').style.display = 'none'; // remplacé par les sommets
   } else {
+    document.getElementById('peaksBox').classList.remove('show');
+    document.getElementById('progressRow').style.display = '';
     badge.className='incl-badge'; badge.innerHTML='';
     nextBox.classList.remove('show'); nextBox.innerHTML='';
     document.getElementById('timerSub').textContent=ph==='effort'?`Exercice ${s.exo} / ${cfg.exo}`:ph==='repos'?'Récupération':'Entre les tours';
@@ -1485,6 +1584,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('genDist').value = trail.dist;
   document.getElementById('genDplus').value = trail.dplus;
   document.getElementById('genDuree').value = trail.duree;
+  renderBlockOptions();
   switchMode(appMode);
   setTerrainProfile(terrainProfile); // met aussi à jour l'aperçu si une séquence existe déjà
 });
