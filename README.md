@@ -1,7 +1,7 @@
 # Minuteur HIIT & Trail — Run Nature
 
 Minuteur d'intervalles gratuit, **hors ligne** et **installable** sur mobile, par [Seb Run Nature](https://sebrunnature.github.io/minuteur-intervalle/).
-Deux modes : **Intervalles** (HIIT, Tabata, côtes, endurance) et **Trail** (séance générée automatiquement pour le tapis, le terrain vallonné ou le plat), avec guidage vocal.
+Deux modes : **Intervalles** (HIIT, Tabata, côtes, endurance) et **Trail** (séance de côtes générée automatiquement pour **tapis de course**, avec guidage vocal). Pensé pour les tapis simples (type salle de sport) qui n'ont pas de programmes de dénivelé automatiques.
 
 👉 **Utiliser l'appli : <https://sebrunnature.github.io/minuteur-intervalle/>**
 
@@ -73,14 +73,6 @@ Le **nombre de tours** se calcule ainsi :
 - **Sommets** : un sommet par montée, avec une barre de **montée cumulée**. La voix annonce « Sommet 2 sur 3 atteint ! » à la fin de chaque montée. Aucune vitesse n'est nécessaire.
 - **Préavis de 10 secondes** avant un changement d'inclinaison : bandeau orange (« Dans 10 s : descends à 1 % ») et annonce vocale, pour avoir le temps de régler le tapis.
 - Aperçu de la phase suivante et mini profil de la séance avec ta position.
-
-### Terrains
-
-- **Tapis** : l'inclinaison s'affiche sur chaque segment et dans un gros badge pendant la séance.
-- **Vallonné** : montée → vraie côte si possible, descente → profite de la pente.
-- **Plat / ville** : fartlek structuré, sans relief nécessaire (montée = accélère, descente = relâche).
-
-En Vallonné et Plat / ville, seuls la flèche et le libellé sont affichés, sans pourcentage.
 
 ## Protocoles du mode Intervalles
 
